@@ -394,6 +394,7 @@ function redrawCanvas(){
 
 /* ====== Sự kiện UI ====== */
 document.addEventListener('DOMContentLoaded', ()=>{
+    initCanvasDrawing();
   // Province -> Wards
   document.getElementById('bd-province').addEventListener('change',populateWardsForProvince);
   populateWardsForProvince();
