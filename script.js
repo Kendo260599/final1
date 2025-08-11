@@ -339,6 +339,69 @@ function exportCSV(){
   const blob=new Blob([csv.join('\n')],{type:'text/csv;charset=utf-8;'}); const url=URL.createObjectURL(blob);
   const a=document.createElement('a'); a.href=url; a.download='ho_so_khach_bds.csv'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
 }
+
+/* ====== Vẽ đa giác nền nhà ====== */
+const polygonPoints=[];
+let centerPoint=null, entrancePoint=null;
+let northRotation=0;
+let dragTarget=null, mode='add';
+let canvas=null, ctx=null;
+
+function getMousePos(evt){
+  const rect=canvas.getBoundingClientRect();
+  return {x:evt.clientX-rect.left,y:evt.clientY-rect.top};
+}
+
+function hitTest(pos){
+  const r=6;
+  for(let i=0;i<polygonPoints.length;i++){
+    const p=polygonPoints[i];
+    if(Math.hypot(p.x-pos.x,p.y-pos.y)<r) return {type:'poly',index:i};
+  }
+  if(centerPoint&&Math.hypot(centerPoint.x-pos.x,centerPoint.y-pos.y)<r) return {type:'center'};
+  if(entrancePoint&&Math.hypot(entrancePoint.x-pos.x,entrancePoint.y-pos.y)<r) return {type:'entrance'};
+  return null;
+}
+
+function draw(){
+  if(!ctx) return;
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.save();
+  ctx.translate(canvas.width/2,canvas.height/2);
+  ctx.rotate(northRotation*Math.PI/180);
+  ctx.translate(-canvas.width/2,-canvas.height/2);
+
+  if(polygonPoints.length>1){
+    ctx.beginPath();
+    ctx.moveTo(polygonPoints[0].x,polygonPoints[0].y);
+    for(let i=1;i<polygonPoints.length;i++) ctx.lineTo(polygonPoints[i].x,polygonPoints[i].y);
+    ctx.closePath();
+    ctx.stroke();
+  }
+
+  ctx.fillStyle='#000';
+  polygonPoints.forEach(p=>{
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,5,0,Math.PI*2);
+    ctx.fill();
+  });
+
+  if(centerPoint){
+    ctx.fillStyle='red';
+    ctx.beginPath();
+    ctx.arc(centerPoint.x,centerPoint.y,5,0,Math.PI*2);
+    ctx.fill();
+  }
+  if(entrancePoint){
+    ctx.fillStyle='blue';
+    ctx.beginPath();
+    ctx.arc(entrancePoint.x,entrancePoint.y,5,0,Math.PI*2);
+    ctx.fill();
+  }
+
+  ctx.restore();
+}
+
 /* ====== Vẽ lên ảnh ====== */
 let drawCanvas, drawCtx, drawImg, drawEnabled=false, drawing=false, currentPath=[], paths=[];
 function initCanvasDrawing(){
@@ -426,6 +489,37 @@ document.addEventListener('DOMContentLoaded', ()=>{
   document.getElementById('btn-compass-start').addEventListener('click',startCompass);
   document.getElementById('btn-compass-stop').addEventListener('click',stopCompass);
   document.getElementById('btn-compass-apply').addEventListener('click',applyCompassToDirection);
+
+   // Canvas polygon
+  canvas=document.getElementById('fengCanvas');
+  if(canvas){
+    ctx=canvas.getContext('2d');
+    draw();
+    canvas.addEventListener('mousedown',e=>{
+      const pos=getMousePos(e);
+      if(mode==='center'){ centerPoint=pos; mode='add'; draw(); return; }
+      if(mode==='entrance'){ entrancePoint=pos; mode='add'; draw(); return; }
+      const hit=hitTest(pos);
+      if(hit) dragTarget=hit; else { polygonPoints.push(pos); draw(); }
+    });
+    canvas.addEventListener('mousemove',e=>{
+      if(!dragTarget) return;
+      const pos=getMousePos(e);
+      if(dragTarget.type==='poly') polygonPoints[dragTarget.index]=pos;
+      else if(dragTarget.type==='center') centerPoint=pos;
+      else if(dragTarget.type==='entrance') entrancePoint=pos;
+      draw();
+    });
+    const endDrag=()=>{dragTarget=null;};
+    canvas.addEventListener('mouseup',endDrag);
+    canvas.addEventListener('mouseleave',endDrag);
+    document.getElementById('btn-set-center').addEventListener('click',()=>{mode='center';});
+    document.getElementById('btn-set-entrance').addEventListener('click',()=>{mode='entrance';});
+    document.getElementById('northAngle').addEventListener('input',e=>{
+      northRotation=parseFloat(e.target.value)||0;
+      draw();
+    });
+  }
 
   // Profiles
   renderProfiles();
