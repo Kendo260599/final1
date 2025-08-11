@@ -194,8 +194,19 @@
                 <th>Thao tác</th>
               </tr>
             </thead>
-            <tbody id="profiles-tbody"></tbody>
-          </table>
+   <tbody id="profiles-tbody"></tbody>
+      </table>
+    </div>
+  </section>
+
+      <section id="draw-section" class="card">
+        <h2>6) Vẽ lên ảnh</h2>
+        <input type="file" id="fileInput" accept="image/*" capture="environment">
+        <div class="toolbar" style="margin:8px 0;">
+          <button id="btn-start-draw" class="secondary" type="button">Bắt đầu vẽ</button>
+          <button id="btn-finish-draw" class="secondary" type="button">Hoàn tất</button>
+          <button id="btn-undo" class="secondary" type="button">Undo</button>
+          <button id="btn-clear" class="secondary" type="button">Xóa</button>
         </div>
       </section>
     </main>
