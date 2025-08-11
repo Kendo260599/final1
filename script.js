@@ -59,7 +59,31 @@ const ISSUES = [
   {id:'beam_over',cat:'Kết cấu',label:'Xà ngang đè giường',impact:'Áp khí.',remedy:'Trần giả/đổi vị trí.'},
   {id:'sink_stove',cat:'Bếp',label:'Bồn rửa sát/đối bếp',impact:'Thủy–Hỏa xung.',remedy:'Cách 60–80cm, vật trung gian.'},
   {id:'wc_center',cat:'WC/Ngủ',label:'WC trung cung',impact:'Uế giữa nhà.',remedy:'Dời vị trí.'},
-  {id:'altar_back_wc',cat:'Bàn thờ',label:'Bàn thờ tựa WC',impact:'Uế sát.',remedy:'Cách tường kỹ thuật/di dời.'}
+    {id:'altar_back_wc',cat:'Bàn thờ',label:'Bàn thờ tựa WC',impact:'Uế sát.',remedy:'Cách tường kỹ thuật/di dời.'},
+  {id:'lot_L',cat:'Lô đất',label:'Đất hình chữ L',impact:'Khuyết góc, khí phân tán.',remedy:'Xây bù góc, làm sân vườn cân bằng.'},
+  {id:'lot_trapezoid',cat:'Lô đất',label:'Đầu to đuôi nhỏ',impact:'Tài tán về sau.',remedy:'Tường rào, cây chắn phía sau.'},
+  {id:'lot_front_narrow',cat:'Lô đất',label:'Mặt tiền hẹp, hậu rộng',impact:'Khó đón khí.',remedy:'Mở rộng cổng, dẫn khí.'},
+  {id:'lot_cut_road',cat:'Lô đất',label:'Đường cắt ngang lô',impact:'Khí chia đôi.',remedy:'Hàng rào kín, bố trí lối đi lệch.'},
+  {id:'door_stair',cat:'Cửa & khí',label:'Cửa chính thẳng cầu thang',impact:'Khí xộc thẳng lên trên.',remedy:'Bình phong, chiếu nghỉ.'},
+  {id:'door_corner',cat:'Cửa & khí',label:'Cửa chính đặt góc xiên',impact:'Khí vào không ổn định.',remedy:'Sửa cửa vuông, che chắn.'},
+  {id:'door_wc',cat:'Cửa & khí',label:'Cửa chính đối cửa WC',impact:'Uế khí xộc vào.',remedy:'Đổi hướng cửa, bình phong.'},
+  {id:'door_pillar',cat:'Cửa & khí',label:'Cửa bị cột đâm vào',impact:'Trực sát.',remedy:'Bố trí cây, gương Bát Quái.'},
+  {id:'pillar_center',cat:'Kết cấu',label:'Cột giữa nhà',impact:'Cản trở lưu thông khí.',remedy:'Che cột, bố trí nội thất hợp lý.'},
+  {id:'stair_center',cat:'Kết cấu',label:'Cầu thang giữa nhà',impact:'Khí xoáy, hao tài.',remedy:'Tiểu cảnh, chắn gió chân thang.'},
+  {id:'split_floor',cat:'Kết cấu',label:'Sàn nhà nứt tách',impact:'Khí suy, thấm nước.',remedy:'Sửa chữa, lát lại.'},
+  {id:'roof_leak',cat:'Kết cấu',label:'Mái dột',impact:'Thủy khí xấu, hư hại.',remedy:'Chống thấm, thay ngói.'},
+  {id:'stove_beam',cat:'Bếp',label:'Bếp dưới xà',impact:'Áp khí, hao tài.',remedy:'Làm trần giả, dời bếp.'},
+  {id:'stove_door',cat:'Bếp',label:'Bếp nhìn thẳng cửa',impact:'Thoát khí, mất lộc.',remedy:'Đổi hướng bếp, rèm che.'},
+  {id:'stove_window',cat:'Bếp',label:'Bếp dưới cửa sổ',impact:'Gió dập lửa, tán khí.',remedy:'Đổi vị trí, che kín.'},
+  {id:'wc_above_kitchen',cat:'WC/Ngủ',label:'WC trên bếp',impact:'Uế khí xuống bếp.',remedy:'Không đặt, hoặc chống thấm tốt.'},
+  {id:'wc_above_bed',cat:'WC/Ngủ',label:'WC trên phòng ngủ',impact:'Ảnh hưởng sức khỏe.',remedy:'Dời WC hoặc giường.'},
+  {id:'bed_mirror',cat:'WC/Ngủ',label:'Giường đối gương',impact:'Nhiễu khí, mất ngủ.',remedy:'Che gương hoặc đổi hướng.'},
+  {id:'bed_window',cat:'WC/Ngủ',label:'Giường sát cửa sổ',impact:'Khí lạnh, thiếu an toàn.',remedy:'Kê giường tránh cửa, rèm dày.'},
+  {id:'altar_under_beam',cat:'Bàn thờ',label:'Bàn thờ dưới xà',impact:'Áp sát, bất kính.',remedy:'Làm trần che, dời bàn thờ.'},
+  {id:'altar_window',cat:'Bàn thờ',label:'Bàn thờ trước cửa sổ',impact:'Gió tán hương.',remedy:'Đóng kín, đổi vị trí.'},
+  {id:'mirror_door',cat:'Khác',label:'Gương chiếu thẳng cửa',impact:'Tán khí, giật mình.',remedy:'Đặt lệch, che gương.'},
+  {id:'clock_dead',cat:'Khác',label:'Đồng hồ chết',impact:'Trì trệ thời vận.',remedy:'Sửa hoặc bỏ đồng hồ.'},
+  {id:'tree_dry',cat:'Khác',label:'Cây khô trước nhà',impact:'Âm khí, xui rủi.',remedy:'Chặt bỏ, trồng cây mới.'}
 ];
 
 /* ====== La bàn số ====== */
