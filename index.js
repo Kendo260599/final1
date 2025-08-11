@@ -4,8 +4,7 @@ require('dotenv').config();
 const app = express();
 app.use(express.json());
 
-// serve static files from project root
-app.use(express.static(path.join(__dirname, '..')));
+app.use(express.static(__dirname));
 
 app.post('/api/ai-analyze', async (req, res) => {
   try {
@@ -50,3 +49,4 @@ app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 
 });
+
