@@ -542,7 +542,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
   document.getElementById('btn-export').addEventListener('click',exportCSV);
 
   // Row actions
-document.getElementById('profiles-tbody').addEventListener('click',e=>{
+ document.getElementById('profiles-tbody').addEventListener('click',e=>{
     const tr=e.target.closest('tr'); if(!tr) return; const id=tr.getAttribute('data-id');
     const list=getProfiles(); const p=list.find(x=>x.id===id); if(!p) return;
     if(e.target.classList.contains('view')){
