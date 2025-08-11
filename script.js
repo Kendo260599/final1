@@ -322,6 +322,7 @@ function renderProfiles(filter=''){
       <td>${fmt(p.createdAt)}</td>
       <td class="row-actions"><button class="view">Xem</button><button class="delete">Xóa</button></td>
     </tr>`).join('');
+  
 }
 
 function exportCSV(){
@@ -337,6 +338,58 @@ function exportCSV(){
   });
   const blob=new Blob([csv.join('\n')],{type:'text/csv;charset=utf-8;'}); const url=URL.createObjectURL(blob);
   const a=document.createElement('a'); a.href=url; a.download='ho_so_khach_bds.csv'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+}
+/* ====== Vẽ lên ảnh ====== */
+let drawCanvas, drawCtx, drawImg, drawEnabled=false, drawing=false, currentPath=[], paths=[];
+function initCanvasDrawing(){
+  drawCanvas=document.getElementById('canvas');
+  if(!drawCanvas) return;
+  drawCtx=drawCanvas.getContext('2d');
+  drawImg=new Image();
+
+  document.getElementById('fileInput').addEventListener('change',e=>{
+    const file=e.target.files[0]; if(!file) return;
+    const reader=new FileReader();
+    reader.onload=ev=>{ drawImg.onload=()=>{
+        const maxW=document.getElementById('draw-section').clientWidth||window.innerWidth;
+        const scale=Math.min(maxW/drawImg.width,1);
+        drawCanvas.width=drawImg.width*scale;
+        drawCanvas.height=drawImg.height*scale;
+        redrawCanvas();
+      }; drawImg.src=ev.target.result; };
+    reader.readAsDataURL(file);
+  });
+
+  document.getElementById('btn-start-draw').addEventListener('click',()=>{drawEnabled=true;});
+  document.getElementById('btn-finish-draw').addEventListener('click',()=>{drawEnabled=false; drawing=false;});
+  document.getElementById('btn-undo').addEventListener('click',()=>{paths.pop(); redrawCanvas();});
+  document.getElementById('btn-clear').addEventListener('click',()=>{paths=[]; currentPath=[]; redrawCanvas();});
+
+  const getPos=e=>{
+    const rect=drawCanvas.getBoundingClientRect();
+    return {x:(e.clientX-rect.left), y:(e.clientY-rect.top)};
+  };
+
+  const start=e=>{ if(!drawEnabled) return; drawing=true; currentPath=[getPos(e)]; };
+  const move=e=>{ if(!drawing) return; currentPath.push(getPos(e)); redrawCanvas(); };
+  const end=()=>{ if(drawing){ paths.push(currentPath); drawing=false; currentPath=[]; redrawCanvas(); } };
+
+  drawCanvas.addEventListener('mousedown',start);
+  drawCanvas.addEventListener('mousemove',move);
+  drawCanvas.addEventListener('mouseup',end);
+  drawCanvas.addEventListener('mouseleave',end);
+  drawCanvas.addEventListener('touchstart',e=>{start(e.touches[0]);});
+  drawCanvas.addEventListener('touchmove',e=>{move(e.touches[0]); e.preventDefault();});
+  drawCanvas.addEventListener('touchend',end);
+}
+
+function redrawCanvas(){
+  if(!drawCtx) return;
+  drawCtx.clearRect(0,0,drawCanvas.width,drawCanvas.height);
+  if(drawImg&&drawImg.complete) drawCtx.drawImage(drawImg,0,0,drawCanvas.width,drawCanvas.height);
+  drawCtx.lineWidth=2; drawCtx.strokeStyle='red'; drawCtx.lineJoin='round'; drawCtx.lineCap='round';
+  const all=[...paths]; if(currentPath.length) all.push(currentPath);
+  all.forEach(path=>{ if(path.length){ drawCtx.beginPath(); drawCtx.moveTo(path[0].x,path[0].y); for(let i=1;i<path.length;i++) drawCtx.lineTo(path[i].x,path[i].y); drawCtx.stroke(); }});
 }
 
 /* ====== Sự kiện UI ====== */
