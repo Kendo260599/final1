@@ -6,5 +6,6 @@ CREATE TABLE IF NOT EXISTS birth_info (
     datetime_utc TEXT NOT NULL,
     latitude REAL NOT NULL,
     longitude REAL NOT NULL,
-    source_note TEXT
+    source_note TEXT,
+    birth_time TEXT
 );
