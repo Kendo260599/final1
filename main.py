@@ -21,22 +21,24 @@ def main() -> None:
     args = parser.parse_args()
 
     repo = BirthInfoRepository("birth_info.db")
-
-    if args.command == "save":
-        info = validate(args.name, args.birth_date)
-        repo.save(info)
-        print("Saved")
-    elif args.command == "chart":
-        name = validate(args.name)
-        info = repo.get_by_name(name)
-        if info is None:
-            raise SystemExit("No birth info found for that name")
-        try:
-            chart = compute_chart(info)
-        except RuntimeError as exc:
-            raise SystemExit(str(exc))
-        for planet, pos in chart.planets.items():
-            print(f"{planet}: {pos.sign} {pos.degree:.2f}")
+    try:
+        if args.command == "save":
+            info = validate(args.name, args.birth_date)
+            repo.save(info)
+            print("Saved")
+        elif args.command == "chart":
+            name = validate(args.name)
+            info = repo.get_by_name(name)
+            if info is None:
+                raise SystemExit("No birth info found for that name")
+            try:
+                chart = compute_chart(info)
+            except RuntimeError as exc:
+                raise SystemExit(str(exc))
+            for planet, pos in chart.planets.items():
+                print(f"{planet}: {pos.sign} {pos.degree:.2f}")
+    finally:
+        repo.close()
 
 
 if __name__ == "__main__":
