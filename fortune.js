@@ -1,4 +1,4 @@
-const parseDateParts = require("./parseDateParts");
+const parseDateParts = require("./parseDateParts.cjs");
 const { idxZ, nameZ, TTG, ZODIAC } = require("./zodiac");
 
 function getEffectiveBirthYear(b) {
