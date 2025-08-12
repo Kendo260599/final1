@@ -232,7 +232,7 @@ function renderIssues(filter=''){
   const wrap=document.getElementById('issues-container'); if(!wrap) return;
   const f=(filter||'').toLowerCase();
   const list=ISSUES.filter(i=> (i.cat+' '+i.label).toLowerCase().includes(f));
-  wrap.innerHTML=list.map(i=>`<label class="issue-item"><input type="checkbox" name="issue" value="${i.id}"><span><strong>[${i.cat}]</strong> ${i.label}</span></label>`).join('');
+  wrap.innerHTML=list.map((i,idx)=>`<label class="issue-item" style="animation-delay:${idx*0.05}s"><input type="checkbox" name="issue" value="${i.id}"><span><strong>[${i.cat}]</strong> ${i.label}</span></label>`).join("");
 }
 function getSelectedIssues(){ return Array.from(document.querySelectorAll('input[name="issue"]:checked')).map(el=>el.value); }
 function checkSiteIssues(ids){
@@ -356,8 +356,8 @@ function renderProfiles(filter=''){
   const tbody=document.getElementById('profiles-tbody');
   const list=getProfiles().filter(p=> (p.customer.name+' '+p.customer.phone).toLowerCase().includes((filter||'').toLowerCase()) );
   const fmt=s=>new Date(s).toLocaleString();
-  tbody.innerHTML=list.map(p=>`
-    <tr data-id="${p.id}">
+  tbody.innerHTML=list.map((p,idx)=>`
+    <tr data-id="${p.id}" style="animation-delay:${idx*0.05}s">
       <td>${p.customer.name}</td>
       <td>${p.customer.phone}</td>
       <td>${p.summary.cung} (${p.summary.menh})</td>
