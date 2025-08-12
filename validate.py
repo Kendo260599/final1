@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-from datetime import date
+"""Input validation helpers."""
+
+from datetime import date, datetime
 from typing import overload
 
 from storage import BirthInfo
