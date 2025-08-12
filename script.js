@@ -673,7 +673,7 @@ function analyzeSectors(){
 }
 
 function draw(){
-  const canvas=document.getElementById('canvas');
+  const canvas=document.getElementById('fengCanvas');
   if(!canvas) return;
   const ctx=canvas.getContext('2d');
   ctx.clearRect(0,0,canvas.width,canvas.height);
