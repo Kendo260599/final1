@@ -37,7 +37,8 @@ class BirthInfoRepository:
                 datetime_utc TEXT NOT NULL,
                 latitude REAL NOT NULL,
                 longitude REAL NOT NULL,
-                source_note TEXT
+                source_note TEXT,
+                birth_time TEXT
             )
             """
         )
@@ -49,13 +50,14 @@ class BirthInfoRepository:
             "latitude": "REAL NOT NULL DEFAULT 0",
             "longitude": "REAL NOT NULL DEFAULT 0",
             "source_note": "TEXT",
+            "birth_time": "TEXT",
         }
         for col, col_def in column_defs.items():
             if col not in cols:
                 self._conn.execute(f"ALTER TABLE birth_info ADD COLUMN {col} {col_def}")
-        self._conn.execute("PRAGMA user_version = 2")
+        self._conn.execute("PRAGMA user_version = 3")
         self._conn.commit()
-
+        
     def save(self, info: BirthInfo) -> None:
         """Insert or update a :class:`BirthInfo` record."""
 
@@ -63,8 +65,8 @@ class BirthInfoRepository:
             self._conn.execute(
                 """
                 INSERT OR REPLACE INTO birth_info (
-                    name, birth_date, gender, datetime_utc, latitude, longitude, source_note
-                ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                    name, birth_date, gender, datetime_utc, latitude, longitude, source_note, birth_time
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     info.name,
@@ -74,6 +76,7 @@ class BirthInfoRepository:
                     info.latitude,
                     info.longitude,
                     info.source_note,
+                    info.birth_time.isoformat() if info.birth_time else None,
                 ),
             )
 
@@ -82,7 +85,7 @@ class BirthInfoRepository:
 
         cur = self._conn.execute(
             """
-            SELECT name, birth_date, gender, datetime_utc, latitude, longitude, source_note
+            SELECT name, birth_date, gender, datetime_utc, latitude, longitude, source_note, birth_time
             FROM birth_info WHERE name = ?
             """,
             (name,),
@@ -98,6 +101,7 @@ class BirthInfoRepository:
             row[4],
             row[5],
             row[6],
+            datetime.fromisoformat(row[7]) if row[7] is not None else None,
         )
 
     def list_all(self) -> List[BirthInfo]:
@@ -105,7 +109,7 @@ class BirthInfoRepository:
 
         cur = self._conn.execute(
             """
-            SELECT name, birth_date, gender, datetime_utc, latitude, longitude, source_note
+            SELECT name, birth_date, gender, datetime_utc, latitude, longitude, source_note, birth_time
             FROM birth_info ORDER BY name
             """
         )
@@ -119,12 +123,14 @@ class BirthInfoRepository:
                 lat,
                 lon,
                 note,
+                datetime.fromisoformat(bt) if bt is not None else None,
             )
-            for name, bd, gender, dt, lat, lon, note in rows
+            for name, bd, gender, dt, lat, lon, note, bt in rows
         ]
 
     def close(self) -> None:
         """Close the underlying database connection."""
 
         self._conn.close()
+
 
