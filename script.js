@@ -294,12 +294,12 @@ async function renderResult(R,i){
   }
   html+=`<hr/><h3 class="block-title">Năm/Tháng xây</h3>`;
   html+=`<p>Tuổi mụ: <strong>${R.ageMu}</strong> — Ngũ hành năm: <strong>${R.yearElement}</strong>${R.monthElement?` — Ngũ hành tháng: <strong>${R.monthElement}</strong>`:''}</p>`;
-  if(R.warnings.length===0) html+=`<p class="good">Năm ${i.yearX}: Không thấy cảnh báo lớn.</p>`; else html+=`<ul class="clean">`+R.warnings.map(w=>`<li class="bad">${w}</li>`).join('')+`</ul>`;
-  if(R.monthWarnings.length===0) html+=`<p class="good">Tháng ${i.monthX}: Không thấy cảnh báo lớn.</p>`; else html+=`<ul class="clean">`+R.monthWarnings.map(w=>`<li class="warn">${w}</li>`).join('')+`</ul>`;
+  if(R.warnings.length===0) html+=`<p><span class="good">Năm ${i.yearX}: Không thấy cảnh báo lớn.</span></p>`; else html+=`<ul class="clean">`+R.warnings.map(w=>`<li><span class="bad">${w}</span></li>`).join('')+`</ul>`;
+  if(R.monthWarnings.length===0) html+=`<p><span class="good">Tháng ${i.monthX}: Không thấy cảnh báo lớn.</span></p>`; else html+=`<ul class="clean">`+R.monthWarnings.map(w=>`<li class="warn">${w}</li>`).join('')+`</ul>`;
 
   html+=`<hr/><h3 class="block-title">Môi trường & lỗi phong thủy</h3>`;
-  if(site.problems.length===0) html+=`<p class="good">Không phát hiện lỗi đã chọn.</p>`;
-  else{ html+=`<p><strong>Vấn đề:</strong></p><ul class="clean">`+site.problems.map(p=>`<li class="bad">${p}</li>`).join('')+`</ul>`;
+   if(site.problems.length===0) html+=`<p><span class="good">Không phát hiện lỗi đã chọn.</span></p>`;
+  else{ html+=`<p><strong>Vấn đề:</strong></p><ul class="clean">`+site.problems.map(p=>`<li><span class="bad">${p}</span></li>`).join('')+`</ul>`;
         html+=`<p><strong>Hóa giải:</strong></p><ul class="clean">`+site.solutions.map(s=>`<li>${s}</li>`).join('')+`</ul>`; }
 
   html+=`<hr/><h3 class="block-title">Thông tin bất động sản</h3>`;
