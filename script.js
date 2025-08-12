@@ -590,7 +590,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
   document.getElementById('btn-export').addEventListener('click',exportCSV);
 
   // Row actions
- document.getElementById('profiles-tbody').addEventListener('click',e=>{
+document.getElementById('profiles-tbody').addEventListener('click',e=>{
     const tr=e.target.closest('tr'); if(!tr) return; const id=tr.getAttribute('data-id');
     const list=getProfiles(); const p=list.find(x=>x.id===id); if(!p) return;
     if(e.target.classList.contains('view')){
@@ -628,4 +628,9 @@ document.addEventListener('DOMContentLoaded', ()=>{
       if(confirm('Xóa hồ sơ này?')){ setProfiles(list.filter(x=>x.id!==id)); renderProfiles(document.getElementById('profiles-search').value); }
     }
   });
+});
+
+document.addEventListener('DOMContentLoaded',()=>{
+  const root=document.querySelector('.page-enter');
+  if(root) root.classList.remove('page-enter');
 });
