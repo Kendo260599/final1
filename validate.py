@@ -44,4 +44,15 @@ def validate(name: str, birth_date: str | None = None):
     except ValueError as exc:
         raise ValueError("birth_date must be in YYYY-MM-DD format") from exc
 
-    return BirthInfo(name=clean_name, birth_date=bd)
+        # ``BirthInfo`` requires additional fields which are not part of the
+    # validation concerns.  Provide sensible defaults so callers interested
+    # only in name and birth date can still receive a full object without
+    # needing to supply extraneous information.
+    return BirthInfo(
+        name=clean_name,
+        birth_date=bd,
+        gender="",
+        datetime_utc=datetime.min,
+        latitude=0.0,
+        longitude=0.0,
+    )
