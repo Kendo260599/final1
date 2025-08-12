@@ -32,9 +32,15 @@ def draw_compass(ax):
                 color='black', linewidth=lw)
 
     directions = {'N': (0, 1), 'E': (1, 0), 'S': (0, -1), 'W': (-1, 0)}
-    for d, (x, y) in directions.items():
+        for d, (x, y) in directions.items():
         ax.text(1.12 * x, 1.12 * y, d, ha='center', va='center',
                 fontsize=20, fontweight='bold', color='crimson')
+
+    trigrams = ["Càn","Khảm","Cấn","Chấn","Tốn","Ly","Khôn","Đoài"]
+    for i, trigram in enumerate(trigrams):
+        angle = np.radians(i * 45)
+        ax.text(1.18*np.cos(angle), 1.18*np.sin(angle), trigram,
+                ha="center", va="center", fontsize=14, color="darkgreen")
 
     sub_dirs = {'NE': (np.sqrt(2)/2, np.sqrt(2)/2),
                 'SE': (np.sqrt(2)/2, -np.sqrt(2)/2),
@@ -50,9 +56,9 @@ def draw_compass(ax):
                 f"{deg}\u00b0", ha='center', va='center', fontsize=10)
 
     ax.set_aspect('equal', adjustable='box')
-    ax.set_xlim(-1.25, 1.25)
-    ax.set_ylim(-1.25, 1.25)
-    ax.axis('off')
+    ax.set_xlim(-1.3, 1.3)
+    ax.set_ylim(-1.3, 1.3)
+    ax.axis('off')␊
 
 
 def make_arrow(angle_deg):
@@ -95,7 +101,8 @@ def main():
     plt.show()
 
 
-if __name__ == "__main__":␊
-    main()
+if __name__ == "__main__":
+    main()␊
+
 
 
