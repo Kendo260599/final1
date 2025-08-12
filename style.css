@@ -4,6 +4,7 @@
   --decor:repeating-linear-gradient(45deg,var(--primary)0 10px,var(--secondary)10px 20px);
 }
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideFadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 .page-enter{opacity:0;animation:fadeIn 0.6s ease-out forwards}
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
@@ -74,3 +75,6 @@ ul.clean li:last-child{border-bottom:none}
 .needle{position:absolute;left:50%;top:50%;width:4px;height:75px;background:#d32f2f;transform-origin:50% 100%;transform:translate(-50%,-100%) rotate(0deg);transition:transform 0.3s ease-out;border-radius:3px;box-shadow:0 0 6px rgba(211,47,47,.3)}
 .compass-info .form-inline{display:flex;gap:8px;align-items:center;margin:8px 0}
 .compass-actions{display:flex;gap:8px;flex-wrap:wrap}
+
+.card,ul.clean li,.issue-item,.data-table tbody tr{opacity:0;animation:slideFadeIn .6s ease forwards}
+.card:nth-of-type(1){animation-delay:0s}.card:nth-of-type(2){animation-delay:.1s}.card:nth-of-type(3){animation-delay:.2s}.card:nth-of-type(4){animation-delay:.3s}.card:nth-of-type(5){animation-delay:.4s}.card:nth-of-type(6){animation-delay:.5s}
