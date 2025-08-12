@@ -209,6 +209,29 @@ function evaluateBuildTime(birth,gender,year,month){
   return {cung,ageMu:age,yearElement:yE,monthElement:mE,warnings,monthWarnings};
 }
 
+function getAuspiciousDays(birth,year,month){
+  const eff=getEffectiveBirthYear(birth);
+  const age=tuoiMu(eff,year);
+  const yE=elemYear(year);
+  const mE=[null,'Thủy',null,'Hỏa','Thổ','Kim','Mộc',null,'Hỏa','Thổ','Kim','Mộc','Thủy'][month]||null;
+  if(checkKimLau(age).isKimLau||checkHoangOc(age).isBad||checkTamTai(eff,year).isTamTai||checkXungTuoi(eff,year).isXung||elemConflict(elemYear(eff),yE)||elemConflict(elemYear(eff),mE)) return [];
+  const birthElem=elemYear(eff);
+  const daysInMonth=new Date(year,month,0).getDate();
+  const bad=[3,5,7,13,14,18,22,23,27,29];
+  const start=new Date(1984,1,2);
+  const BE={'Tý':'Thủy','Sửu':'Thổ','Dần':'Mộc','Mão':'Mộc','Thìn':'Thổ','Tỵ':'Hỏa','Ngọ':'Hỏa','Mùi':'Thổ','Thân':'Kim','Dậu':'Kim','Tuất':'Thổ','Hợi':'Thủy'};
+  const list=[];
+  for(let d=1; d<=daysInMonth; d++){
+    if(bad.includes(d)) continue;
+    const date=new Date(year,month-1,d);
+    const diff=Math.floor((date-start)/86400000);
+    const branch=ZODIAC[(diff%12+12)%12];
+    const elem=BE[branch];
+    if(!elemConflict(birthElem,elem)) list.push(d);
+  }
+  return list;
+}
+
 /* ====== UI: Wards theo tỉnh, Issues, La bàn, Lưu hồ sơ ====== */
 function populateWardsForProvince(){
   const prov=document.getElementById('bd-province').value;
@@ -634,8 +657,29 @@ document.addEventListener('DOMContentLoaded', ()=>{
       if(!i.monthX||i.monthX<1||i.monthX>12) return alert('Tháng xây không hợp lệ.');
       const R=evaluateBuildTime(i.birth,i.gender,i.yearX,i.monthX);
       await renderResult(R,i);
+      const days=getAuspiciousDays(i.birth,i.yearX,i.monthX);
+      const el=document.getElementById('auspicious-days');
+      if(el) el.innerHTML = days.length?`<strong>Ngày đẹp:</strong> ${days.join(', ')}`:'Không có ngày phù hợp.';
+      const inp=document.getElementById('ad-month');
+      if(inp) inp.value=`${i.yearX}-${String(i.monthX).padStart(2,'0')}`;
     }catch(err){ alert('Lỗi: '+(err.message||err)); }
   });
+
+  const btnGood=document.getElementById('btn-auspicious');
+  if(btnGood){
+    btnGood.addEventListener('click',()=>{
+      try{
+        const birth=document.getElementById('ngay-sinh').value.trim();
+        const ym=document.getElementById('ad-month').value;
+        if(!birth) return alert('Vui lòng nhập ngày sinh.');
+        if(!ym) return alert('Vui lòng chọn tháng.');
+        const [y,m]=ym.split('-').map(Number);
+        const days=getAuspiciousDays(birth,y,m);
+        const el=document.getElementById('auspicious-days');
+        if(el) el.innerHTML = days.length?`<strong>Ngày đẹp:</strong> ${days.join(', ')}`:'Không có ngày phù hợp.';
+      }catch(err){ alert('Lỗi: '+(err.message||err)); }
+    });
+  }
 
   // Save / Export
   document.getElementById('btn-save').addEventListener('click',()=>{ try{ saveProfile(); }catch(err){ alert('Lỗi: '+(err.message||err)); }});
@@ -674,6 +718,13 @@ document.getElementById('profiles-tbody').addEventListener('click',e=>{
       document.querySelectorAll('input[name="issue"]').forEach(cb=> cb.checked=set.has(cb.value));
 
       renderResult(p.result,{...p.input,bds:p.bds,issueIds:p.input.issueIds||[]});
+      const ad=document.getElementById('auspicious-days');
+      if(ad){
+        const days=getAuspiciousDays(p.input.birth,p.input.yearX,p.input.monthX);
+        ad.innerHTML=days.length?`<strong>Ngày đẹp:</strong> ${days.join(', ')}`:'Không có ngày phù hợp.';
+      }
+      const inp=document.getElementById('ad-month');
+      if(inp) inp.value=`${p.input.yearX}-${String(p.input.monthX).padStart(2,'0')}`;
       window.scrollTo({top:0,behavior:'smooth'});
     }
     if(e.target.classList.contains('delete')){
