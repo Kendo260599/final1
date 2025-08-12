@@ -1,15 +1,15 @@
-const {
+import {
   getEffectiveBirthYear,
   tuoiMu,
   checkKimLau,
   checkHoangOc,
   checkTamTai,
   checkXungTuoi,
-} = require("./fortune");
-const { elemYear, elemConflict } = require("./elements");
-const { ZODIAC } = require("./zodiac");
+} from "./fortune.mjs";
+import { elemYear, elemConflict } from "./elements.js";
+import { ZODIAC } from "./zodiac.js";
 
-function getAuspiciousDays(birth, year, month) {
+export default function getAuspiciousDays(birth, year, month) {
   const eff = getEffectiveBirthYear(birth);
   const age = tuoiMu(eff, year);
   const yE = elemYear(year);
@@ -68,4 +68,4 @@ function getAuspiciousDays(birth, year, month) {
   return list;
 }
 
-module.exports = getAuspiciousDays;
+
