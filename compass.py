@@ -32,7 +32,7 @@ def draw_compass(ax):
                 color='black', linewidth=lw)
 
     directions = {'N': (0, 1), 'E': (1, 0), 'S': (0, -1), 'W': (-1, 0)}
-        for d, (x, y) in directions.items():
+    for d, (x, y) in directions.items():
         ax.text(1.12 * x, 1.12 * y, d, ha='center', va='center',
                 fontsize=20, fontweight='bold', color='crimson')
 
@@ -41,6 +41,16 @@ def draw_compass(ax):
         angle = np.radians(i * 45)
         ax.text(1.18*np.cos(angle), 1.18*np.sin(angle), trigram,
                 ha="center", va="center", fontsize=14, color="darkgreen")
+
+    earthly_branches = ["Tý","Sửu","Dần","Mão","Thìn","Tỵ","Ngọ","Mùi","Thân","Dậu","Tuất","Hợi"] * 2
+    for i in range(24):
+        deg = i * 15
+        angle = np.radians(deg)
+        x, y = 0.95*np.cos(angle), 0.95*np.sin(angle)
+        ax.text(x, y, earthly_branches[i], fontsize=9, ha="center", va="center")
+        ax.plot([0.9*np.cos(angle), np.cos(angle)],
+                [0.9*np.sin(angle), np.sin(angle)],
+                color='black', linewidth=0.5)
 
     sub_dirs = {'NE': (np.sqrt(2)/2, np.sqrt(2)/2),
                 'SE': (np.sqrt(2)/2, -np.sqrt(2)/2),
@@ -58,7 +68,7 @@ def draw_compass(ax):
     ax.set_aspect('equal', adjustable='box')
     ax.set_xlim(-1.3, 1.3)
     ax.set_ylim(-1.3, 1.3)
-    ax.axis('off')␊
+    ax.axis('off')
 
 
 def make_arrow(angle_deg):
@@ -102,7 +112,10 @@ def main():
 
 
 if __name__ == "__main__":
-    main()␊
+    main()
+
+
+
 
 
 
