@@ -1,5 +1,6 @@
 /* ====== Danh sách Phường/Xã mới (95 đơn vị) tách theo Tỉnh ====== */
 import parseDateParts from "./parseDateParts.js";
+import { ISSUES, detectIssues } from "./siteIssues.mjs";
 /* 55 đơn vị thuộc Đồng Nai (theo thứ tự bạn cung cấp: 1..15, 24..63) */
 const DN_WARDS_2025 = [
   // Đồng Nai
@@ -27,65 +28,6 @@ const BP_WARDS_2025 = [
   'Xã Phước Sơn','Xã Nghĩa Trung','Xã Bù Đăng','Xã Thọ Sơn','Xã Đak Nhau','Xã Bom Bo'
 ];
 
-/* ====== Issues (50+) – giữ nguyên từ bản trước ====== */
-const ISSUES = [
-  {id:'hospital',cat:'Ngoại cảnh',label:'Đối diện/gần Bệnh viện',impact:'Âm khí, ảnh hưởng sức khỏe.',remedy:'Cây xanh, ánh sáng ấm, rèm dày; bình phong; cân nhắc Bát Quái lồi.'},
-  {id:'cemetery',cat:'Ngoại cảnh',label:'Gần nghĩa trang/nhà tang lễ',impact:'Âm khí nặng, khó tụ tài.',remedy:'Hàng rào kín, cây tán dày, đèn ấm; hạn chế cửa nhìn thẳng.'},
-  {id:'crematorium',cat:'Ngoại cảnh',label:'Gần lò hỏa táng',impact:'Ám khí, bất an.',remedy:'Che chắn mạnh (cây, tường), nước + đá cân bằng.'},
-  {id:'temple',cat:'Ngoại cảnh',label:'Đối diện Chùa',impact:'Khí tĩnh/âm, giảm tài khí.',remedy:'Quan Công gần cửa, chuông gió kim loại.'},
-  {id:'church',cat:'Ngoại cảnh',label:'Đối diện Nhà thờ',impact:'Khí tĩnh, giờ lễ ồn.',remedy:'Bình phong, rèm dày, dùng cửa phụ.'},
-  {id:'school',cat:'Ngoại cảnh',label:'Đối diện Trường học',impact:'Ồn, khí động mạnh.',remedy:'Vách ngăn, rèm cách âm.'},
-  {id:'market',cat:'Ngoại cảnh',label:'Sát chợ/siêu thị ồn',impact:'Khí tạp.',remedy:'Cửa 2 lớp, cây “lọc khí”.'},
-  {id:'gas',cat:'Ngoại cảnh',label:'Gần trạm xăng/kho gas',impact:'Hỏa khí, nguy cơ cháy nổ.',remedy:'Khoảng cách an toàn, tường chống cháy.'},
-  {id:'transformer',cat:'Ngoại cảnh',label:'Gần trạm biến áp',impact:'Từ trường, ồn.',remedy:'Lùi cổng/cửa, tường đặc, cây cao.'},
-  {id:'pylon',cat:'Ngoại cảnh',label:'Cột điện trước cổng',impact:'Sát khí, cản khí.',remedy:'Lùi cổng, cây cao, bình phong.'},
-  {id:'bts',cat:'Ngoại cảnh',label:'Cột BTS/anten',impact:'Từ trường, thị giác xấu.',remedy:'Che chắn cây, mái.'},
-  {id:'deadend',cat:'Ngoại cảnh',label:'Hẻm cụt',impact:'Khí bí, đọng xấu.',remedy:'Đèn sáng, cây/đá/nước đầu nhà.'},
-  {id:'T_cross',cat:'Ngoại cảnh',label:'Ngã ba chữ T đâm thẳng',impact:'Trực sát.',remedy:'Bình phong, bậc cấp gãy dòng.'},
-  {id:'Y_cross',cat:'Ngoại cảnh',label:'Ngã ba chữ Y',impact:'Khí loạn.',remedy:'Cổng kín, hiên che, cây đệm.'},
-  {id:'crossroad',cat:'Ngoại cảnh',label:'Ngã tư lớn/cao tốc',impact:'Khí động mạnh, bụi.',remedy:'Lam chắn gió, kính cách âm.'},
-  {id:'curve_blade',cat:'Ngoại cảnh',label:'Đường cong “lưỡi đao”',impact:'Hình sát chém.',remedy:'Bình phong, tường cong mềm.'},
-  {id:'rail',cat:'Ngoại cảnh',label:'Sát đường tàu',impact:'Rung, ồn, xung khí.',remedy:'Chống ồn/rung, công năng ngủ lùi sâu.'},
-  {id:'underbridge',cat:'Ngoại cảnh',label:'Dưới chân cầu',impact:'Thiếu sáng, áp lực.',remedy:'Tăng sáng, màu ấm.'},
-  {id:'slope',cat:'Ngoại cảnh',label:'Đường dốc trước nhà',impact:'Khí trượt khó tụ.',remedy:'Bậc thềm, bồn cây bậc cấp.'},
-  {id:'lowfloor',cat:'Ngoại cảnh',label:'Nền thấp hơn đường',impact:'Ngập, khí xấu tràn.',remedy:'Nâng cốt nền, rãnh thoát nước.'},
-  {id:'highfloor',cat:'Ngoại cảnh',label:'Nền quá cao',impact:'Khó dẫn khí, dốc nguy.',remedy:'Bậc thoải, tiểu cảnh mềm.'},
-  {id:'sharpcorner',cat:'Ngoại cảnh',label:'Góc nhọn chĩa vào',impact:'Hình sát đâm.',remedy:'Cây/bình phong che.'},
-  {id:'river_back',cat:'Ngoại cảnh',label:'Sông/hồ phía sau',impact:'Thủy sau nhà bất ổn.',remedy:'Hàng rào, cây, hạn chế cửa lớn.'},
-  {id:'polluted',cat:'Ngoại cảnh',label:'Mương/cống ô nhiễm',impact:'Uế khí.',remedy:'Che kín, xử lý mùi.'},
-  {id:'streetlight',cat:'Ngoại cảnh',label:'Đèn đường rọi cửa',impact:'Quang sát.',remedy:'Rèm dày, lam che.'},
-  // … (các mục nhóm Lô đất, Cửa-khí, Kết cấu, Bếp, WC/Ngủ, Bàn thờ, Khác) đã đủ tổng 50+ ở bản trước
-  {id:'lot_triangle',cat:'Lô đất',label:'Đất hình tam giác',impact:'Khó tụ tài.',remedy:'Cắt góc/tiểu cảnh.'},
-  {id:'door_back',cat:'Cửa & khí',label:'Cửa trước thẳng cửa sau',impact:'Thoát khí.',remedy:'Bình phong, đổi lệch cửa.'},
-  {id:'beam_over',cat:'Kết cấu',label:'Xà ngang đè giường',impact:'Áp khí.',remedy:'Trần giả/đổi vị trí.'},
-  {id:'sink_stove',cat:'Bếp',label:'Bồn rửa sát/đối bếp',impact:'Thủy–Hỏa xung.',remedy:'Cách 60–80cm, vật trung gian.'},
-  {id:'wc_center',cat:'WC/Ngủ',label:'WC trung cung',impact:'Uế giữa nhà.',remedy:'Dời vị trí.'},
-    {id:'altar_back_wc',cat:'Bàn thờ',label:'Bàn thờ tựa WC',impact:'Uế sát.',remedy:'Cách tường kỹ thuật/di dời.'},
-  {id:'lot_L',cat:'Lô đất',label:'Đất hình chữ L',impact:'Khuyết góc, khí phân tán.',remedy:'Xây bù góc, làm sân vườn cân bằng.'},
-  {id:'lot_trapezoid',cat:'Lô đất',label:'Đầu to đuôi nhỏ',impact:'Tài tán về sau.',remedy:'Tường rào, cây chắn phía sau.'},
-  {id:'lot_front_narrow',cat:'Lô đất',label:'Mặt tiền hẹp, hậu rộng',impact:'Khó đón khí.',remedy:'Mở rộng cổng, dẫn khí.'},
-  {id:'lot_cut_road',cat:'Lô đất',label:'Đường cắt ngang lô',impact:'Khí chia đôi.',remedy:'Hàng rào kín, bố trí lối đi lệch.'},
-  {id:'door_stair',cat:'Cửa & khí',label:'Cửa chính thẳng cầu thang',impact:'Khí xộc thẳng lên trên.',remedy:'Bình phong, chiếu nghỉ.'},
-  {id:'door_corner',cat:'Cửa & khí',label:'Cửa chính đặt góc xiên',impact:'Khí vào không ổn định.',remedy:'Sửa cửa vuông, che chắn.'},
-  {id:'door_wc',cat:'Cửa & khí',label:'Cửa chính đối cửa WC',impact:'Uế khí xộc vào.',remedy:'Đổi hướng cửa, bình phong.'},
-  {id:'door_pillar',cat:'Cửa & khí',label:'Cửa bị cột đâm vào',impact:'Trực sát.',remedy:'Bố trí cây, gương Bát Quái.'},
-  {id:'pillar_center',cat:'Kết cấu',label:'Cột giữa nhà',impact:'Cản trở lưu thông khí.',remedy:'Che cột, bố trí nội thất hợp lý.'},
-  {id:'stair_center',cat:'Kết cấu',label:'Cầu thang giữa nhà',impact:'Khí xoáy, hao tài.',remedy:'Tiểu cảnh, chắn gió chân thang.'},
-  {id:'split_floor',cat:'Kết cấu',label:'Sàn nhà nứt tách',impact:'Khí suy, thấm nước.',remedy:'Sửa chữa, lát lại.'},
-  {id:'roof_leak',cat:'Kết cấu',label:'Mái dột',impact:'Thủy khí xấu, hư hại.',remedy:'Chống thấm, thay ngói.'},
-  {id:'stove_beam',cat:'Bếp',label:'Bếp dưới xà',impact:'Áp khí, hao tài.',remedy:'Làm trần giả, dời bếp.'},
-  {id:'stove_door',cat:'Bếp',label:'Bếp nhìn thẳng cửa',impact:'Thoát khí, mất lộc.',remedy:'Đổi hướng bếp, rèm che.'},
-  {id:'stove_window',cat:'Bếp',label:'Bếp dưới cửa sổ',impact:'Gió dập lửa, tán khí.',remedy:'Đổi vị trí, che kín.'},
-  {id:'wc_above_kitchen',cat:'WC/Ngủ',label:'WC trên bếp',impact:'Uế khí xuống bếp.',remedy:'Không đặt, hoặc chống thấm tốt.'},
-  {id:'wc_above_bed',cat:'WC/Ngủ',label:'WC trên phòng ngủ',impact:'Ảnh hưởng sức khỏe.',remedy:'Dời WC hoặc giường.'},
-  {id:'bed_mirror',cat:'WC/Ngủ',label:'Giường đối gương',impact:'Nhiễu khí, mất ngủ.',remedy:'Che gương hoặc đổi hướng.'},
-  {id:'bed_window',cat:'WC/Ngủ',label:'Giường sát cửa sổ',impact:'Khí lạnh, thiếu an toàn.',remedy:'Kê giường tránh cửa, rèm dày.'},
-  {id:'altar_under_beam',cat:'Bàn thờ',label:'Bàn thờ dưới xà',impact:'Áp sát, bất kính.',remedy:'Làm trần che, dời bàn thờ.'},
-  {id:'altar_window',cat:'Bàn thờ',label:'Bàn thờ trước cửa sổ',impact:'Gió tán hương.',remedy:'Đóng kín, đổi vị trí.'},
-  {id:'mirror_door',cat:'Khác',label:'Gương chiếu thẳng cửa',impact:'Tán khí, giật mình.',remedy:'Đặt lệch, che gương.'},
-  {id:'clock_dead',cat:'Khác',label:'Đồng hồ chết',impact:'Trì trệ thời vận.',remedy:'Sửa hoặc bỏ đồng hồ.'},
-  {id:'tree_dry',cat:'Khác',label:'Cây khô trước nhà',impact:'Âm khí, xui rủi.',remedy:'Chặt bỏ, trồng cây mới.'}
-];
 
 /* ====== La bàn số ====== */
 const EARTHLY_BRANCHES=["Tý","Sửu","Dần","Mão","Thìn","Tỵ","Ngọ","Mùi","Thân","Dậu","Tuất","Hợi","Tý","Sửu","Dần","Mão","Thìn","Tỵ","Ngọ","Mùi","Thân","Dậu","Tuất","Hợi"];
@@ -257,17 +199,23 @@ function composeFullAddress(){
   const parts=[]; if(detail)parts.push(detail); if(ward)parts.push(ward); if(huyen)parts.push(huyen); parts.push(prov);
   return parts.join(', ');
 }
-function renderIssues(filter=''){
-  const wrap=document.getElementById('issues-container'); if(!wrap) return;
-  const f=(filter||'').toLowerCase();
-  const list=ISSUES.filter(i=> (i.cat+' '+i.label).toLowerCase().includes(f));
-  wrap.innerHTML=list.map((i,idx)=>`<label class="issue-item" style="animation-delay:${idx*0.05}s"><input type="checkbox" name="issue" value="${i.id}"><span><strong>[${i.cat}]</strong> ${i.label}</span></label>`).join("");
-}
-function getSelectedIssues(){ return Array.from(document.querySelectorAll('input[name="issue"]:checked')).map(el=>el.value); }
-function checkSiteIssues(ids){
-  const problems=[],solutions=[]; const map=new Map(ISSUES.map(i=>[i.id,i]));
-  ids.forEach(id=>{ const it=map.get(id); if(it){problems.push(`${it.label}: ${it.impact}`); solutions.push(`Hóa giải: ${it.remedy}`);} });
-  return {problems,solutions};
+
+function checkSiteIssues(input){
+  let result;
+  if(Array.isArray(input)){
+    const map=new Map(ISSUES.map(i=>[i.id,i]));
+    const problems=[],solutions=[];
+    input.forEach(id=>{ const it=map.get(id); if(it){ problems.push(`${it.label}: ${it.impact}`); solutions.push(`Hóa giải: ${it.remedy}`); }});
+    result={ids:input,problems,solutions};
+  }else{
+    result=detectIssues(input||{});
+  }
+  const wrap=document.getElementById('issues-container');
+  if(wrap){
+    if(result.ids.length===0) wrap.innerHTML='<p class="good">Không phát hiện lỗi.</p>';
+    else wrap.innerHTML=result.ids.map(id=>{ const it=ISSUES.find(i=>i.id===id); return `<div class="issue-item"><strong>[${it.cat}]</strong> ${it.label}</div>`; }).join('');
+  }
+  return result;
 }
 
 const STORAGE_KEY='ptpro_profiles_wards2025';
@@ -375,13 +323,19 @@ function gatherInputs(){
   const price=parseFloat(document.getElementById('bd-price').value)||0;
   const detail=document.getElementById('bd-address-detail').value.trim();
   const note=document.getElementById('bd-note').value.trim();
-  const issueIds=getSelectedIssues();
 
   const fullAddr=composeFullAddress();
   document.getElementById('bd-full-address').textContent=fullAddr||'—';
 
   const bds={province,ward,huyen,to,thua,addressDetail:detail,fullAddress:fullAddr,price,note};
-  return {name,phone,birth,gender,huong,yearX,monthX,bds,issueIds};
+  const layout={
+    polygon:polygonPoints.map(p=>({x:p.x,y:p.y})),
+    center:centerPoint,
+    entrance:entrancePoint,
+    stair:stairPoint,
+    north:northRotation
+  };
+  return {name,phone,birth,gender,huong,yearX,monthX,bds,layout};
 }
 
 async function calculateHoroscope(birth, gender){
@@ -411,7 +365,7 @@ async function calculateHoroscope(birth, gender){
 
 async function renderResult(R,i){
   const dir=analyzeHouseDirection(R.cung.cung,i.huong);
-  const site=checkSiteIssues(i.issueIds);
+  const site=checkSiteIssues(i.layout || i.issueIds || []);
   const num=calculateNumerology(i.birth);
   let html='';
   html+=`<div class="ket-luan"><div><span class="badge">Cung mệnh</span> <strong>${R.cung.cung}</strong> — Ngũ hành: <strong>${R.cung.nguyenTo}</strong> — Nhóm: <strong>${R.cung.nhomTrach}</strong></div><div><span class="badge">Thần số học</span> <strong>${num.number}</strong> — ${num.meaning}</div></div>`;
@@ -472,16 +426,17 @@ function saveProfile(currentResult){
   if(!i.monthX||i.monthX<1||i.monthX>12) return alert('Tháng xây không hợp lệ.');
   const R=currentResult||evaluateBuildTime(i.birth,i.gender,i.yearX,i.monthX);
   const numerology=calculateNumerology(i.birth);
+  const site=detectIssues(i.layout);
   const list=getProfiles(); const phoneKey=normalizePhone(i.phone); const idx=list.findIndex(p=>p.customer.phoneKey===phoneKey);
   const profile={
     id:idx>=0?list[idx].id:uuid(),
     createdAt:idx>=0?list[idx].createdAt:new Date().toISOString(),
     updatedAt:new Date().toISOString(),
     customer:{name:i.name,phone:i.phone,phoneKey},
-    input:{birth:i.birth,gender:i.gender,huong:i.huong,year:i.yearX,month:i.monthX,issueIds:i.issueIds},
+    input:{birth:i.birth,gender:i.gender,huong:i.huong,year:i.yearX,month:i.monthX,issueIds:site.ids},
     bds:i.bds,
     result:{...R,numerology},
-    summary:{cung:R.cung.cung,menh:R.cung.nguyenTo,nhom:R.cung.nhomTrach,dir:i.huong,fullAddress:i.bds.fullAddress,to:i.bds.to,thua:i.bds.thua,price:i.bds.price,issues:i.issueIds.length,numerology:numerology.number}
+    summary:{cung:R.cung.cung,menh:R.cung.nguyenTo,nhom:R.cung.nhomTrach,dir:i.huong,fullAddress:i.bds.fullAddress,to:i.bds.to,thua:i.bds.thua,price:i.bds.price,issues:site.ids.length,numerology:numerology.number}
   };
   if(idx>=0) list[idx]=profile; else list.unshift(profile);
   setProfiles(list); renderProfiles(); alert('Đã lưu hồ sơ.');
@@ -525,7 +480,7 @@ function exportCSV(){
 
 /* ====== Vẽ đa giác nền nhà ====== */
 const polygonPoints=[];
-let centerPoint=null, entrancePoint=null;
+let centerPoint=null, entrancePoint=null, stairPoint=null;
 let northRotation=0;
 let dragTarget=null, mode='add';
 let canvas=null, ctx=null;
@@ -543,6 +498,7 @@ function hitTest(pos){
   }
   if(centerPoint&&Math.hypot(centerPoint.x-pos.x,centerPoint.y-pos.y)<r) return {type:'center'};
   if(entrancePoint&&Math.hypot(entrancePoint.x-pos.x,entrancePoint.y-pos.y)<r) return {type:'entrance'};
+  if(stairPoint&&Math.hypot(stairPoint.x-pos.x,stairPoint.y-pos.y)<r) return {type:'stair'};
   return null;
 }
 
@@ -579,6 +535,12 @@ function draw(){
     ctx.fillStyle='blue';
     ctx.beginPath();
     ctx.arc(entrancePoint.x,entrancePoint.y,5,0,Math.PI*2);
+    ctx.fill();
+  }
+  if(stairPoint){
+    ctx.fillStyle='green';
+    ctx.beginPath();
+    ctx.arc(stairPoint.x,stairPoint.y,5,0,Math.PI*2);
     ctx.fill();
   }
 
@@ -671,8 +633,8 @@ document.addEventListener('DOMContentLoaded', ()=>{
     alert('Đã lưu phường/xã mới vào danh sách cục bộ.');
   });
 
-  // Issues
-  renderIssues(); document.getElementById('issues-search').addEventListener('input',e=>renderIssues(e.target.value));
+  const issuesWrap=document.getElementById('issues-container');
+  if(issuesWrap) issuesWrap.innerHTML='<p class="muted">Chưa phân tích.</p>';
 
   // Compass
   document.getElementById('btn-compass-start').addEventListener('click',startCompass);
@@ -688,6 +650,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
       const pos=getMousePos(e);
       if(mode==='center'){ centerPoint=pos; mode='add'; draw(); return; }
       if(mode==='entrance'){ entrancePoint=pos; mode='add'; draw(); return; }
+      if(mode==='stair'){ stairPoint=pos; mode='add'; draw(); return; }
       const hit=hitTest(pos);
       if(hit) dragTarget=hit; else { polygonPoints.push(pos); draw(); }
     });
@@ -697,6 +660,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
       if(dragTarget.type==='poly') polygonPoints[dragTarget.index]=pos;
       else if(dragTarget.type==='center') centerPoint=pos;
       else if(dragTarget.type==='entrance') entrancePoint=pos;
+      else if(dragTarget.type==='stair') stairPoint=pos;
       draw();
     });
     const endDrag=()=>{dragTarget=null;};
@@ -704,6 +668,8 @@ document.addEventListener('DOMContentLoaded', ()=>{
     canvas.addEventListener('mouseleave',endDrag);
     document.getElementById('btn-set-center').addEventListener('click',()=>{mode='center';});
     document.getElementById('btn-set-entrance').addEventListener('click',()=>{mode='entrance';});
+    const stairBtn=document.getElementById('btn-set-stair');
+    if(stairBtn) stairBtn.addEventListener('click',()=>{mode='stair';});
     document.getElementById('northAngle').addEventListener('input',e=>{
       northRotation=parseFloat(e.target.value)||0;
       const dial=document.querySelector('.dial');
@@ -799,11 +765,6 @@ document.getElementById('profiles-tbody').addEventListener('click',e=>{
       document.getElementById('bd-price').value=p.bds.price||'';
       document.getElementById('bd-note').value=p.bds.note||'';
       document.getElementById('bd-full-address').textContent=p.bds.fullAddress||'—';
-
-      // tick lại issues
-      renderIssues(document.getElementById('issues-search').value||'');
-      const set=new Set(p.input.issueIds||[]);
-      document.querySelectorAll('input[name="issue"]').forEach(cb=> cb.checked=set.has(cb.value));
 
       renderResult(p.result,{...p.input,bds:p.bds,issueIds:p.input.issueIds||[]});
       const ad=document.getElementById('auspicious-days');
