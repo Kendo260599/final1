@@ -565,6 +565,8 @@ document.addEventListener('DOMContentLoaded', ()=>{
     document.getElementById('btn-set-entrance').addEventListener('click',()=>{mode='entrance';});
     document.getElementById('northAngle').addEventListener('input',e=>{
       northRotation=parseFloat(e.target.value)||0;
+      const dial=document.querySelector('.dial');
+      if(dial) dial.style.transform=`rotate(${northRotation}deg)`;
       draw();
     });
   }
