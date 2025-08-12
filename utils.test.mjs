@@ -1,17 +1,17 @@
-const test = require("node:test");
-const assert = require("node:assert");
+import test from "node:test";
+import assert from "node:assert";
 
-const parseDateParts = require("./parseDateParts.cjs");
-const { elemYear, elemConflict } = require("./elements");
-const {
+import parseDateParts from "./parseDateParts.mjs";
+import { elemYear, elemConflict } from "./elements.js";
+import {
   getEffectiveBirthYear,
   tuoiMu,
   checkKimLau,
   checkHoangOc,
   checkTamTai,
   checkXungTuoi,
-} = require("./fortune");
-const getAuspiciousDays = require("./getAuspiciousDays");
+} from "./fortune.mjs";
+import getAuspiciousDays from "./getAuspiciousDays.mjs";
 
 test("parseDateParts handles different formats", () => {
   assert.deepStrictEqual(parseDateParts("1990-12-25"), {
