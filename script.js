@@ -280,6 +280,31 @@ function gatherInputs(){
   return {name,phone,birth,gender,huong,yearX,monthX,bds,issueIds};
 }
 
+async function calculateHoroscope(birth, gender){
+  const yearMatch = (birth||'').match(/\d{4}/);
+  const year = yearMatch ? parseInt(yearMatch[0],10) : NaN;
+  if(!year) return { error: 'Ngày sinh không hợp lệ' };
+  const CAN=['Giáp','Ất','Bính','Đinh','Mậu','Kỷ','Canh','Tân','Nhâm','Quý'];
+  const CHI=['Tý','Sửu','Dần','Mão','Thìn','Tỵ','Ngọ','Mùi','Thân','Dậu','Tuất','Hợi'];
+  const ELEMENT=['Kim','Thủy','Mộc','Hỏa','Thổ'];
+  const canIdx=(year+6)%10;
+  const chiIdx=(year+8)%12;
+  const element=ELEMENT[Math.floor(canIdx/2)];
+  const result={
+    namCanChi:`${CAN[canIdx]} ${CHI[chiIdx]}`,
+    nguHanh:element,
+    cuc:`${element} cục`
+  };
+  try{
+    const res=await fetch(`/api/horoscope?birth=${encodeURIComponent(birth)}&gender=${encodeURIComponent(gender)}`);
+    if(res.ok){
+      const data=await res.json();
+      Object.assign(result,data);
+    }
+  }catch(err){ /* optional API */ }
+  return result;
+}
+
 async function renderResult(R,i){
   const dir=analyzeHouseDirection(R.cung.cung,i.huong);
   const site=checkSiteIssues(i.issueIds);
@@ -580,6 +605,25 @@ document.addEventListener('DOMContentLoaded', ()=>{
   // Profiles
   renderProfiles();
   document.getElementById('profiles-search').addEventListener('input',e=>renderProfiles(e.target.value));
+
+  // Horoscope
+  const btnHs=document.getElementById('btn-horoscope');
+  if(btnHs){
+    btnHs.addEventListener('click',async()=>{
+      const birth=document.getElementById('ngay-sinh').value.trim();
+      const gender=document.getElementById('gioi-tinh').value;
+      if(!birth) return alert('Vui lòng nhập ngày sinh.');
+      const data=await calculateHoroscope(birth,gender);
+      const el=document.getElementById('horoscope-result');
+      if(data.error){ el.textContent=data.error; return; }
+      let html=`<p><strong>Năm:</strong> ${data.namCanChi||'—'}</p>`;
+      html+=`<p><strong>Ngũ hành:</strong> ${data.nguHanh||'—'}</p>`;
+      if(data.cuc) html+=`<p><strong>Cục:</strong> ${data.cuc}</p>`;
+      if(data.sao) html+=`<p><strong>Sao:</strong> ${data.sao}</p>`;
+      if(data.text) html+=`<p>${data.text}</p>`;
+      el.innerHTML=html;
+    });
+  }
 
   // Analyze
   document.getElementById('btn-analyze').addEventListener('click',async()=>{
