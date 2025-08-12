@@ -5,7 +5,6 @@ const app = express();
 app.use(express.json());
 
 app.use(express.static(__dirname));
-const getAuspiciousDays = require("./getAuspiciousDays");
 
 app.post("/api/ai-analyze", async (req, res) => {
   try {
@@ -84,8 +83,9 @@ app.get("/api/horoscope", async (req, res) => {
   }
 });
 
-app.get("/api/auspicious-days", (req, res) => {
+app.get("/api/auspicious-days", async (req, res) => {
   try {
+    const { default: getAuspiciousDays } = await import("./getAuspiciousDays.mjs");
     const { birth, year, month } = req.query;
     const y = parseInt(year, 10),
       m = parseInt(month, 10);
@@ -102,4 +102,5 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
+
 
