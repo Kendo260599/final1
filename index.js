@@ -5,7 +5,7 @@ const app = express();
 app.use(express.json());
 
 app.use(express.static(__dirname));
-const getAuspiciousDays = require("./utils/getAuspiciousDays");
+const getAuspiciousDays = require("./getAuspiciousDays");
 
 app.post("/api/ai-analyze", async (req, res) => {
   try {
@@ -102,3 +102,4 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
+
