@@ -61,11 +61,14 @@ class ChartData:
 def compute_chart(info: BirthInfo) -> ChartData:
     """Compute planetary positions for the given ``BirthInfo``.
 
+    When ``info.birth_time`` is ``None`` the calculation assumes a default
+    time of **12:00 UTC**.
+
     Parameters
     ----------
     info:
-        Birth information including date. The time is assumed to be noon
-        UTC if not provided.
+        Birth information including date. ``birth_time`` is optional and
+        defaults to ``12:00 UTC`` when not supplied.
 
     Returns
     -------
@@ -83,7 +86,10 @@ def compute_chart(info: BirthInfo) -> ChartData:
             "pyswisseph is required for compute_chart"  # noqa: TRY003 - simple runtime message
         ) from _import_error
 
-    dt = datetime.combine(info.birth_date, time(12, 0))
+       if info.birth_time is not None:
+        dt = datetime.combine(info.birth_date, info.birth_time.time())
+    else:
+        dt = datetime.combine(info.birth_date, time(12, 0))
     jd = swe.julday(dt.year, dt.month, dt.day, dt.hour + dt.minute / 60.0)
 
     positions: Dict[str, PlanetPosition] = {}
@@ -97,3 +103,4 @@ def compute_chart(info: BirthInfo) -> ChartData:
         positions[name] = PlanetPosition(longitude=lon, sign=sign, degree=degree)
 
     return ChartData(planets=positions)
+
