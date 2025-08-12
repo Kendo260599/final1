@@ -1,7 +1,7 @@
 const test = require("node:test");
 const assert = require("node:assert");
 
-const parseDateParts = require("./parseDateParts");
+const parseDateParts = require("./parseDateParts.cjs");
 const { elemYear, elemConflict } = require("./elements");
 const {
   getEffectiveBirthYear,
