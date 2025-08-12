@@ -1,5 +1,6 @@
-const parseDateParts = require("./parseDateParts.cjs");
-const { idxZ, nameZ, TTG, ZODIAC } = require("./zodiac");
+import parseDateParts from "./parseDateParts.mjs";
+import zodiac from "./zodiac.js";
+const { idxZ, nameZ, TTG, ZODIAC } = zodiac;
 
 function getEffectiveBirthYear(b) {
   const { year, month, day } = parseDateParts(b);
@@ -53,7 +54,7 @@ function checkXungTuoi(ownerYear, year) {
   return { isXung: idxZ(year) === opp, opp: ZODIAC[opp], yearChi: nameZ(year) };
 }
 
-module.exports = {
+export {
   getEffectiveBirthYear,
   tuoiMu,
   checkKimLau,
