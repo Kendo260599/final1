@@ -308,6 +308,35 @@ function lunarToSolar(y,m,d){
   return null;
 }
 
+function ensureSolarBirth(birth){
+  if(!birth) return birth;
+  const calType=document.getElementById('calendar-type')?.value||'solar';
+  if(calType==='lunar' && typeof lunarToSolar==='function'){
+    try{
+      const parts=birth.split(/[-\/]/).map(x=>parseInt(x,10));
+      let y,m,d;
+      if(parts[0]>31){[y,m,d]=parts;} else {[d,m,y]=parts;}
+      const sol=lunarToSolar(y,m,d);
+      if(sol){
+        return `${sol.year}-${String(sol.month).padStart(2,'0')}-${String(sol.day).padStart(2,'0')}`;
+      }
+    }catch(err){ console.error('lunarToSolar failed',err); }
+  }
+  return birth;
+}
+
+function ensureSolarMonth(year,month){
+  if(isNaN(year)||isNaN(month)) return {year,month};
+  const calType=document.getElementById('calendar-type')?.value||'solar';
+  if(calType==='lunar' && typeof lunarToSolar==='function'){
+    try{
+      const sol=lunarToSolar(year,month,1);
+      if(sol){ return {year:sol.year,month:sol.month}; }
+    }catch(err){ console.error('lunarToSolar failed',err); }
+  }
+  return {year,month};
+}
+
 function updateLunarDisplay(){
   const el=document.getElementById('ngay-am'); if(!el) return;
   const raw=document.getElementById('ngay-sinh').value.trim();
@@ -331,26 +360,12 @@ function updateLunarDisplay(){
 function gatherInputs(){
   const name=document.getElementById('kh-ten').value.trim();
   const phone=document.getElementById('kh-phone').value.trim();
-  let birth=document.getElementById('ngay-sinh').value.trim();
-  const calType=document.getElementById('calendar-type')?.value||'solar';
-  if(calType==='lunar' && typeof lunarToSolar==='function'){
-    try{
-      const parts=birth.split(/[-\/]/).map(x=>parseInt(x,10));
-      let y,m,d;
-      if(parts[0]>31){[y,m,d]=parts;} else {[d,m,y]=parts;}
-      const sol=lunarToSolar(y,m,d);
-      if(sol){
-        if(typeof sol==='string') birth=sol;
-        else if(sol.year&&sol.month&&sol.day){
-          birth=`${sol.year}-${String(sol.month).padStart(2,'0')}-${String(sol.day).padStart(2,'0')}`;
-        }
-      }
-    }catch(err){ console.error('lunarToSolar failed',err); }
-  }
+  let birth=ensureSolarBirth(document.getElementById('ngay-sinh').value.trim());
   const gender=document.getElementById('gioi-tinh').value;
   const huong=document.getElementById('huong-nha').value;
-  const yearX=parseInt(document.getElementById('nam-xay').value,10);
-  const monthX=parseInt(document.getElementById('thang-xay').value,10);
+  let yearX=parseInt(document.getElementById('nam-xay').value,10);
+  let monthX=parseInt(document.getElementById('thang-xay').value,10);
+  ({year:yearX,month:monthX}=ensureSolarMonth(yearX,monthX));
 
   const province=document.getElementById('bd-province').value;
   const ward=currentWardValue();
@@ -705,7 +720,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
   const btnHs=document.getElementById('btn-horoscope');
   if(btnHs){
     btnHs.addEventListener('click',async()=>{
-      const birth=document.getElementById('ngay-sinh').value.trim();
+      let birth=ensureSolarBirth(document.getElementById('ngay-sinh').value.trim());
       const gender=document.getElementById('gioi-tinh').value;
       if(!birth) return alert('Vui lòng nhập ngày sinh.');
       const data=await calculateHoroscope(birth,gender);
@@ -741,12 +756,12 @@ document.addEventListener('DOMContentLoaded', ()=>{
   if(btnGood){
     btnGood.addEventListener('click',()=>{
       try{
-        const birth=document.getElementById('ngay-sinh').value.trim();
+        let birth=ensureSolarBirth(document.getElementById('ngay-sinh').value.trim());
         const ym=document.getElementById('ad-month').value;
         if(!birth) return alert('Vui lòng nhập ngày sinh.');
         if(!ym) return alert('Vui lòng chọn tháng.');
-        const [y,m]=ym.split('-').map(Number);
-        const days=getAuspiciousDays(birth,y,m);
+        let [y,m]=ym.split('-').map(Number);
+        ({year:y,month:m}=ensureSolarMonth(y,m));
         const el=document.getElementById('auspicious-days');
         if(el) el.innerHTML = days.length?`<strong>Ngày đẹp:</strong> ${days.join(', ')}`:'Không có ngày phù hợp.';
       }catch(err){ alert('Lỗi: '+(err.message||err)); }
