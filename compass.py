@@ -1,15 +1,26 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider
-from matplotlib.patches import FancyArrowPatch
+from matplotlib.patches import FancyArrowPatch, Wedge
 
 
 def draw_compass(ax):
     """Vẽ nền la bàn với các vạch chia và chữ hướng."""
-    for r in np.linspace(0, 1, 200):
-        ax.add_patch(plt.Circle((0, 0), r, color=plt.cm.Blues(0.2 + 0.8 * r), alpha=0.6))
 
+    # Blend a radial gradient: darker at the rim, lighter toward the center
+    for r in np.linspace(1, 0, 200):
+        color = plt.cm.Blues(0.3 + 0.7 * r)
+        alpha = 0.4 + 0.4 * (1 - r)
+        ax.add_patch(plt.Circle((0, 0), r, color=color, alpha=alpha))
+
+    # Outer boundary
     ax.add_patch(plt.Circle((0, 0), 1, edgecolor='black', facecolor='none', linewidth=2))
+
+    # Central pivot
+    ax.add_patch(plt.Circle((0, 0), 0.05, color="silver", zorder=5))
+
+    # Glossy highlight on the top half
+    ax.add_patch(Wedge((0, 0), 1, 0, 180, facecolor='white', alpha=0.15, zorder=4))
 
     for deg in range(0, 360, 5):
         angle = np.radians(deg)
@@ -84,6 +95,7 @@ def main():
     plt.show()
 
 
-if __name__ == "__main__":
-    main()␊
+if __name__ == "__main__":␊
+    main()
+
 
