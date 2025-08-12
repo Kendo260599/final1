@@ -28,14 +28,20 @@ def to_utc(dt_local: datetime, tz: str) -> datetime:
     """
 
     if _USE_ZONEINFO:
-        tzinfo = ZoneInfo(tz)
+        try:
+            tzinfo = ZoneInfo(tz)
+        except Exception as exc:  # pragma: no cover - error path
+            raise ValueError(f"Unknown timezone: {tz}") from exc
         if dt_local.tzinfo is None:
             dt_local = dt_local.replace(tzinfo=tzinfo)
         else:
             dt_local = dt_local.astimezone(tzinfo)
         return dt_local.astimezone(ZoneInfo("UTC"))
     else:  # pragma: no cover - executed only when zoneinfo isn't available
-        tzinfo = pytz.timezone(tz)
+        try:
+            tzinfo = pytz.timezone(tz)
+        except Exception as exc:  # pragma: no cover - error path
+            raise ValueError(f"Unknown timezone: {tz}") from exc
         if dt_local.tzinfo is None:
             dt_local = tzinfo.localize(dt_local)
         else:
