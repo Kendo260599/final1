@@ -7,6 +7,7 @@ import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from time_utils import to_utc
+import pytest
 
 try:
     from zoneinfo import ZoneInfo
@@ -29,3 +30,9 @@ def test_to_utc_new_york_summer():
 def test_to_utc_new_york_winter():
     dt_local = datetime(2024, 1, 1, 12, 0)
     assert to_utc(dt_local, "America/New_York") == datetime(2024, 1, 1, 17, 0, tzinfo=UTC)
+
+
+def test_to_utc_invalid_timezone():
+    dt_local = datetime(2024, 1, 1, 12, 0)
+    with pytest.raises(ValueError, match="Unknown timezone: Invalid/Timezone"):
+        to_utc(dt_local, "Invalid/Timezone")
