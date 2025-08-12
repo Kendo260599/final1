@@ -138,6 +138,27 @@ function applyCompassToDirection(){
 
 /* ====== Phong thủy cốt lõi: cung mệnh, bát trạch, cảnh báo ====== */
 function parseDateParts(s){ if(!s||typeof s!=='string') throw new Error('Ngày sinh không hợp lệ'); s=s.trim(); const sep=s.includes('-')?'-':(s.includes('/')?'/':null); if(!sep) throw new Error('Định dạng ngày phải có "-" hoặc "/"'); const a=s.split(sep).map(x=>parseInt(x,10)); if(a.length!==3||a.some(isNaN)) throw new Error('Định dạng ngày không đúng'); if(a[0]>31) return {year:a[0],month:a[1],day:a[2]}; return {year:a[2],month:a[1],day:a[0]}; }
+function calculateNumerology(birth){
+  const {year,month,day}=parseDateParts(birth);
+  const sumDigits=n=>n.toString().split('').reduce((a,b)=>a+parseInt(b,10),0);
+  let total=sumDigits(day)+sumDigits(month)+sumDigits(year);
+  while(total>9 && total!==11 && total!==22 && total!==33){ total=sumDigits(total); }
+  const meanings={
+    1:'Lãnh đạo, độc lập, tiên phong.',
+    2:'Hài hòa, hợp tác.',
+    3:'Sáng tạo, lạc quan.',
+    4:'Kỷ luật, nền tảng vững.',
+    5:'Tự do, thay đổi.',
+    6:'Trách nhiệm, yêu thương.',
+    7:'Tri thức, phân tích.',
+    8:'Tham vọng, thành công vật chất.',
+    9:'Nhân đạo, lý tưởng.',
+    11:'Trực giác mạnh, tâm linh.',
+    22:'Kiến tạo lớn, thực tế.',
+    33:'Phụng sự vô điều kiện.'
+  };
+  return {number:total,meaning:meanings[total]||''};
+}
 function getEffectiveBirthYear(b){ const {year,month,day}=parseDateParts(b); if(month<3||(month===3&&day<=13)) return year-1; return year; }
 const MALE_START=1921, FEMALE_START=1922;
 const MALE_SEQ=['Đoài','Càn','Khôn','Tốn','Chấn','Khôn','Khảm','Ly','Cấn']; const FEMALE_SEQ=['Cấn','Khảm','Ly','Tốn','Chấn','Khôn','Càn','Đoài','Cấn']; const mod9=n=>((n%9)+9)%9;
@@ -256,8 +277,9 @@ function gatherInputs(){
 async function renderResult(R,i){
   const dir=analyzeHouseDirection(R.cung.cung,i.huong);
   const site=checkSiteIssues(i.issueIds);
+  const num=calculateNumerology(i.birth);
   let html='';
-  html+=`<div class="ket-luan"><div><span class="badge">Cung mệnh</span> <strong>${R.cung.cung}</strong> — Ngũ hành: <strong>${R.cung.nguyenTo}</strong> — Nhóm: <strong>${R.cung.nhomTrach}</strong></div></div>`;
+  html+=`<div class="ket-luan"><div><span class="badge">Cung mệnh</span> <strong>${R.cung.cung}</strong> — Ngũ hành: <strong>${R.cung.nguyenTo}</strong> — Nhóm: <strong>${R.cung.nhomTrach}</strong></div><div><span class="badge">Thần số học</span> <strong>${num.number}</strong> — ${num.meaning}</div></div>`;
   html+=`<h3 class="block-title">Hướng nhà: ${i.huong} <span class="tag ${dir.selected?.loai||'warn'}">${dir.selected?.ten||'—'}</span></h3>`;
   if(dir.selected){
     const adv = dir.selected.loai==='good'
@@ -314,6 +336,7 @@ function saveProfile(currentResult){
   if(!i.yearX||i.yearX<1900||i.yearX>2099) return alert('Năm xây không hợp lệ.');
   if(!i.monthX||i.monthX<1||i.monthX>12) return alert('Tháng xây không hợp lệ.');
   const R=currentResult||evaluateBuildTime(i.birth,i.gender,i.yearX,i.monthX);
+  const numerology=calculateNumerology(i.birth);
   const list=getProfiles(); const phoneKey=normalizePhone(i.phone); const idx=list.findIndex(p=>p.customer.phoneKey===phoneKey);
   const profile={
     id:idx>=0?list[idx].id:uuid(),
@@ -322,8 +345,8 @@ function saveProfile(currentResult){
     customer:{name:i.name,phone:i.phone,phoneKey},
     input:{birth:i.birth,gender:i.gender,huong:i.huong,year:i.yearX,month:i.monthX,issueIds:i.issueIds},
     bds:i.bds,
-    result:R,
-    summary:{cung:R.cung.cung,menh:R.cung.nguyenTo,nhom:R.cung.nhomTrach,dir:i.huong,fullAddress:i.bds.fullAddress,to:i.bds.to,thua:i.bds.thua,price:i.bds.price,issues:i.issueIds.length}
+    result:{...R,numerology},
+    summary:{cung:R.cung.cung,menh:R.cung.nguyenTo,nhom:R.cung.nhomTrach,dir:i.huong,fullAddress:i.bds.fullAddress,to:i.bds.to,thua:i.bds.thua,price:i.bds.price,issues:i.issueIds.length,numerology:numerology.number}
   };
   if(idx>=0) list[idx]=profile; else list.unshift(profile);
   setProfiles(list); renderProfiles(); alert('Đã lưu hồ sơ.');
@@ -338,6 +361,7 @@ function renderProfiles(filter=''){
       <td>${p.customer.name}</td>
       <td>${p.customer.phone}</td>
       <td>${p.summary.cung} (${p.summary.menh})</td>
+      <td>${p.summary.numerology||''}</td>
       <td>${p.summary.dir}</td>
       <td>${p.summary.fullAddress||''}</td>
       <td>${(p.summary.to||'')}${p.summary.thua?(' / '+p.summary.thua):''}</td>
@@ -351,12 +375,12 @@ function renderProfiles(filter=''){
 
 function exportCSV(){
   const rows=getProfiles(); if(rows.length===0) return alert('Chưa có dữ liệu để xuất.');
-  const header=['id','name','phone','birth','gender','huong','year','month','cung','menh','nhom','address','ward','huyen','province','to','thua','price','issues','note','createdAt'];
+  const header=['id','name','phone','birth','gender','huong','year','month','cung','menh','nhom','numerology','address','ward','huyen','province','to','thua','price','issues','note','createdAt'];
   const csv=[header.join(',')];
   rows.forEach(p=>{
     const b=p.bds||{};
     const r=[p.id,`"${(p.customer.name||'').replace(/"/g,'""')}"`,p.customer.phone,p.input.birth,p.input.gender,p.input.huong,p.input.year,p.input.month,
-      p.result?.cung?.cung||'',p.result?.cung?.nguyenTo||'',p.result?.cung?.nhomTrach||'',
+      p.result?.cung?.cung||'',p.result?.cung?.nguyenTo||'',p.result?.cung?.nhomTrach||'',p.result?.numerology?.number||'',
       b.fullAddress||'',b.ward||'',b.huyen||'',b.province||'',b.to||'',b.thua||'',b.price||'',(p.input.issueIds||[]).length,(b.note||'').replace(/,/g,';'),p.createdAt];
     csv.push(r.join(','));
   });
