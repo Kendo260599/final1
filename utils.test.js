@@ -1,8 +1,8 @@
 const test = require("node:test");
 const assert = require("node:assert");
 
-const parseDateParts = require("../utils/parseDateParts");
-const { elemYear, elemConflict } = require("../utils/elements");
+const parseDateParts = require("./parseDateParts");
+const { elemYear, elemConflict } = require("./elements");
 const {
   getEffectiveBirthYear,
   tuoiMu,
@@ -10,8 +10,8 @@ const {
   checkHoangOc,
   checkTamTai,
   checkXungTuoi,
-} = require("../utils/fortune");
-const getAuspiciousDays = require("../utils/getAuspiciousDays");
+} = require("./fortune");
+const getAuspiciousDays = require("./getAuspiciousDays");
 
 test("parseDateParts handles different formats", () => {
   assert.deepStrictEqual(parseDateParts("1990-12-25"), {
