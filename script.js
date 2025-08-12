@@ -277,6 +277,57 @@ const uuid=()=> (crypto?.randomUUID ? crypto.randomUUID() : 'id_'+Date.now()+Mat
 function normalizePhone(p){ p=(p||'').replace(/[^\d+]/g,'').trim(); if(p.startsWith('+84'))return p; if(p.startsWith('0')&&p.length>=9)return '+84'+p.slice(1); return p; }
 function isValidPhone(p){ p=normalizePhone(p); const vn=/^\+?84(3|5|7|8|9)\d{8}$/; const g=/^\+?\d{8,13}$/; return vn.test(p)||g.test(p); }
 
+function solarToLunar(y,m,d){
+  try{
+    const fmt=new Intl.DateTimeFormat('vi-u-ca-chinese',{day:'numeric',month:'numeric',year:'numeric'});
+    const parts=fmt.format(new Date(y,m-1,d)).split('-');
+    const day=parseInt(parts[0],10);
+    const month=parseInt(parts[1],10);
+    const year=parseInt(parts[2],10);
+    const isLeap=parts[1].includes('Nhuận');
+    return {year,month,day,isLeap};
+  }catch(err){ console.error('solarToLunar failed',err); return null; }
+}
+
+function lunarToSolar(y,m,d){
+  try{
+    const fmt=new Intl.DateTimeFormat('vi-u-ca-chinese',{day:'numeric',month:'numeric',year:'numeric'});
+    let date=new Date(y,0,1);
+    for(let i=0;i<370;i++){
+      const parts=fmt.format(date).split('-');
+      const day=parseInt(parts[0],10);
+      const month=parseInt(parts[1],10);
+      const year=parseInt(parts[2],10);
+      const isLeap=parts[1].includes('Nhuận');
+      if(year===y && month===m && day===d && !isLeap){
+        return {year:date.getFullYear(),month:date.getMonth()+1,day:date.getDate()};
+      }
+      date.setDate(date.getDate()+1);
+    }
+  }catch(err){ console.error('lunarToSolar failed',err); }
+  return null;
+}
+
+function updateLunarDisplay(){
+  const el=document.getElementById('ngay-am'); if(!el) return;
+  const raw=document.getElementById('ngay-sinh').value.trim();
+  if(!raw){ el.textContent=''; return; }
+  const parts=raw.split(/[-\/]/).map(x=>parseInt(x,10));
+  let y,m,d;
+  if(parts[0]>31){[y,m,d]=parts;} else {[d,m,y]=parts;}
+  const calType=document.getElementById('calendar-type')?.value||'solar';
+  if(calType==='lunar'){
+    const sol=lunarToSolar(y,m,d);
+    if(sol){ y=sol.year; m=sol.month; d=sol.day; }
+  }
+  const lun=solarToLunar(y,m,d);
+  if(lun){
+    el.textContent=`Âm lịch: ${String(lun.day).padStart(2,'0')}/${String(lun.month).padStart(2,'0')}/${lun.year}`;
+  }else{
+    el.textContent='';
+  }
+}
+
 function gatherInputs(){
   const name=document.getElementById('kh-ten').value.trim();
   const phone=document.getElementById('kh-phone').value.trim();
@@ -579,6 +630,12 @@ document.addEventListener('DOMContentLoaded', ()=>{
   document.getElementById('bd-province').addEventListener('change',populateWardsForProvince);
   populateWardsForProvince();
 
+    const birthEl=document.getElementById('ngay-sinh');
+  const calEl=document.getElementById('calendar-type');
+  if(birthEl) birthEl.addEventListener('input',updateLunarDisplay);
+  if(calEl) calEl.addEventListener('change',updateLunarDisplay);
+  updateLunarDisplay();
+
   document.getElementById('bd-ward').addEventListener('change',e=>{
     document.getElementById('ward-custom-wrap').style.display = (e.target.value==='__other__')?'block':'none';
     document.getElementById('bd-full-address').textContent = composeFullAddress();
@@ -706,10 +763,11 @@ document.getElementById('profiles-tbody').addEventListener('click',e=>{
     const list=getProfiles(); const p=list.find(x=>x.id===id); if(!p) return;
     if(e.target.classList.contains('view')){
       // fill form
-      document.getElementById('kh-ten').value=p.customer.name;
-      document.getElementById('kh-phone').value=p.customer.phone;
-      document.getElementById('ngay-sinh').value=p.input.birth;
-      document.getElementById('gioi-tinh').value=p.input.gender;
+        document.getElementById('kh-ten').value=p.customer.name;
+        document.getElementById('kh-phone').value=p.customer.phone;
+        document.getElementById('ngay-sinh').value=p.input.birth;
+        updateLunarDisplay();
+        document.getElementById('gioi-tinh').value=p.input.gender;
       document.getElementById('huong-nha').value=p.input.huong;
       document.getElementById('nam-xay').value=p.input.year;
       document.getElementById('thang-xay').value=p.input.month;
