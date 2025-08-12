@@ -17,6 +17,7 @@ class BirthInfo:
     latitude: float
     longitude: float
     source_note: Optional[str] = None
+    birth_time: Optional[datetime] = None
 
 
 class BirthInfoRepository:
@@ -126,3 +127,4 @@ class BirthInfoRepository:
         """Close the underlying database connection."""
 
         self._conn.close()
+
