@@ -194,7 +194,8 @@ function currentWardValue(){
 function composeFullAddress(){
   const prov=document.getElementById('bd-province').value;
   const ward=currentWardValue();
-  const huyen=document.getElementById('bd-huyen').value.trim(); // tùy chọn
+  const huyenEl=document.getElementById('bd-huyen');
+  const huyen=huyenEl ? huyenEl.value.trim() : ''; // tùy chọn
   const detail=document.getElementById('bd-address-detail').value.trim();
   const parts=[]; if(detail)parts.push(detail); if(ward)parts.push(ward); if(huyen)parts.push(huyen); parts.push(prov);
   return parts.join(', ');
@@ -317,7 +318,8 @@ function gatherInputs(){
 
   const province=document.getElementById('bd-province').value;
   const ward=currentWardValue();
-  const huyen=document.getElementById('bd-huyen').value.trim();
+  const huyenEl=document.getElementById('bd-huyen');
+  const huyen=huyenEl ? huyenEl.value.trim() : '';
   const to=document.getElementById('bd-to').value.trim();
   const thua=document.getElementById('bd-thua').value.trim();
   const price=parseFloat(document.getElementById('bd-price').value)||0;
@@ -618,7 +620,8 @@ document.addEventListener('DOMContentLoaded', ()=>{
     document.getElementById('bd-full-address').textContent = composeFullAddress();
   });
   ['bd-ward-custom','bd-huyen','bd-address-detail','bd-to','bd-thua','bd-price','bd-note'].forEach(id=>{
-    const el=document.getElementById(id); el.addEventListener('input',()=>{ document.getElementById('bd-full-address').textContent=composeFullAddress(); });
+    const el=document.getElementById(id);
+    if(el) el.addEventListener('input',()=>{ document.getElementById('bd-full-address').textContent=composeFullAddress(); });
   });
   document.getElementById('btn-save-ward').addEventListener('click',()=>{
     const prov=document.getElementById('bd-province').value;
@@ -758,7 +761,8 @@ document.getElementById('profiles-tbody').addEventListener('click',e=>{
       const wards=(p.bds.province==='Bình Phước'?BP_WARDS_2025:DN_WARDS_2025);
       if(wards.includes(p.bds.ward)){ document.getElementById('bd-ward').value=p.bds.ward; document.getElementById('ward-custom-wrap').style.display='none'; }
       else { document.getElementById('bd-ward').value='__other__'; document.getElementById('ward-custom-wrap').style.display='block'; document.getElementById('bd-ward-custom').value=p.bds.ward||''; }
-      document.getElementById('bd-huyen').value=p.bds.huyen||'';
+      const huyenEl=document.getElementById('bd-huyen');
+      if(huyenEl) huyenEl.value=p.bds.huyen||'';
       document.getElementById('bd-to').value=p.bds.to||'';
       document.getElementById('bd-thua').value=p.bds.thua||'';
       document.getElementById('bd-address-detail').value=p.bds.addressDetail||'';
