@@ -1,4 +1,4 @@
-function parseDateParts(s) {
+export default function parseDateParts(s) {
   if (!s || typeof s !== "string") throw new Error("Ngày sinh không hợp lệ");
   s = s.trim();
   const sep = s.includes("-") ? "-" : s.includes("/") ? "/" : null;
@@ -10,4 +10,3 @@ function parseDateParts(s) {
   return { year: a[2], month: a[1], day: a[0] };
 }
 
-module.exports = parseDateParts;
