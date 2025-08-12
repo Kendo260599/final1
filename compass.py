@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider
+from matplotlib.patches import FancyArrowPatch
 
 
 def draw_compass(ax):
@@ -47,8 +48,12 @@ def make_arrow(angle_deg):
     """Tạo hai mũi tên chỉ hướng Bắc và Nam."""
     ang = np.radians(angle_deg)
     x, y = np.sin(ang), np.cos(ang)
-    arrow_n = plt.Arrow(0, 0, x * 0.8, y * 0.8, width=0.05, color='red')
-    arrow_s = plt.Arrow(0, 0, -x * 0.8, -y * 0.8, width=0.05, color='navy')
+    arrow_n = FancyArrowPatch((0, 0), (x * 0.8, y * 0.8),
+                              arrowstyle="simple", color="red",
+                              mutation_scale=20, linewidth=2)
+    arrow_s = FancyArrowPatch((0, 0), (-x * 0.8, -y * 0.8),
+                              arrowstyle="simple", color="navy",
+                              mutation_scale=20, linewidth=2)
     return arrow_n, arrow_s
 
 
@@ -61,7 +66,7 @@ def main():
     ax.add_patch(arrow_n)
     ax.add_patch(arrow_s)
 
-        ax_slider = plt.axes([0.25, 0.05, 0.5, 0.03])
+    ax_slider = plt.axes([0.25, 0.05, 0.5, 0.03])
     slider = Slider(ax_slider, 'Góc', 0, 360, valinit=0)
     heading_text = ax.text(0, -1.1, "0\u00b0", ha="center", va="center", fontsize=14)
 
@@ -79,5 +84,6 @@ def main():
     plt.show()
 
 
-if __name__ == "__main__":␊
-    main()
+if __name__ == "__main__":
+    main()␊
+
