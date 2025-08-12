@@ -280,7 +280,22 @@ function isValidPhone(p){ p=normalizePhone(p); const vn=/^\+?84(3|5|7|8|9)\d{8}$
 function gatherInputs(){
   const name=document.getElementById('kh-ten').value.trim();
   const phone=document.getElementById('kh-phone').value.trim();
-  const birth=document.getElementById('ngay-sinh').value.trim();
+  let birth=document.getElementById('ngay-sinh').value.trim();
+  const calType=document.getElementById('calendar-type')?.value||'solar';
+  if(calType==='lunar' && typeof lunarToSolar==='function'){
+    try{
+      const parts=birth.split(/[-\/]/).map(x=>parseInt(x,10));
+      let y,m,d;
+      if(parts[0]>31){[y,m,d]=parts;} else {[d,m,y]=parts;}
+      const sol=lunarToSolar(y,m,d);
+      if(sol){
+        if(typeof sol==='string') birth=sol;
+        else if(sol.year&&sol.month&&sol.day){
+          birth=`${sol.year}-${String(sol.month).padStart(2,'0')}-${String(sol.day).padStart(2,'0')}`;
+        }
+      }
+    }catch(err){ console.error('lunarToSolar failed',err); }
+  }
   const gender=document.getElementById('gioi-tinh').value;
   const huong=document.getElementById('huong-nha').value;
   const yearX=parseInt(document.getElementById('nam-xay').value,10);
