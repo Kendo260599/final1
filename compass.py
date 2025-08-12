@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.widgets import Slider
-from matplotlib.patches import FancyArrowPatch, Wedge
+from matplotlib.widgets import Slider␊
+from matplotlib.patches import FancyArrowPatch, Wedge␊
 
 
 def draw_compass(ax):
@@ -71,10 +71,10 @@ def draw_compass(ax):
     ax.axis('off')
 
 
-def make_arrow(angle_deg):
-    """Tạo hai mũi tên chỉ hướng Bắc và Nam."""
-    ang = np.radians(angle_deg)
-    x, y = np.sin(ang), np.cos(ang)
+def make_arrow(angle_deg):␊
+    """Tạo hai mũi tên chỉ hướng Bắc và Nam."""␊
+    ang = np.radians(angle_deg)␊
+    x, y = np.sin(ang), np.cos(ang)␊
     arrow_n = FancyArrowPatch((0, 0), (x * 0.8, y * 0.8),
                               arrowstyle="simple", color="red",
                               mutation_scale=20, linewidth=2)
@@ -82,6 +82,22 @@ def make_arrow(angle_deg):
                               arrowstyle="simple", color="navy",
                               mutation_scale=20, linewidth=2)
     return arrow_n, arrow_s
+
+
+def lookup_trigram(angle):
+    """Tra cứu quẻ và cung dựa trên góc."""
+    mapping = [
+        ("Càn", "Sinh Khí"),
+        ("Khảm", "Thiên Y"),
+        ("Cấn", "Diên Niên"),
+        ("Chấn", "Phục Vị"),
+        ("Tốn", "Tuyệt Mệnh"),
+        ("Ly", "Ngũ Quỷ"),
+        ("Khôn", "Lục Sát"),
+        ("Đoài", "Họa Hại"),
+    ]
+    idx = int((angle % 360) // 45)
+    return mapping[idx]
 
 
 def main():
@@ -96,15 +112,18 @@ def main():
     ax_slider = plt.axes([0.25, 0.05, 0.5, 0.03])
     slider = Slider(ax_slider, 'Góc', 0, 360, valinit=0)
     heading_text = ax.text(0, -1.1, "0\u00b0", ha="center", va="center", fontsize=14)
+    info_text = ax.text(0, -1.05, "Càn – Sinh Khí", ha="center", va="center", fontsize=12)
 
     def update(val):
-        nonlocal arrow_n, arrow_s, heading_text
+        nonlocal arrow_n, arrow_s, heading_text, info_text
         arrow_n.remove()
         arrow_s.remove()
         arrow_n, arrow_s = make_arrow(slider.val)
         ax.add_patch(arrow_n)
         ax.add_patch(arrow_s)
         heading_text.set_text(f"{slider.val:.0f}\u00b0")
+        trigram, cung = lookup_trigram(slider.val)
+        info_text.set_text(f"{trigram} – {cung}")
         fig.canvas.draw_idle()
 
     slider.on_changed(update)
@@ -113,6 +132,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
