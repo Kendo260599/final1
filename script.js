@@ -1,4 +1,5 @@
 /* ====== Danh sách Phường/Xã mới (95 đơn vị) tách theo Tỉnh ====== */
+const parseDateParts = require("./parseDateParts");
 /* 55 đơn vị thuộc Đồng Nai (theo thứ tự bạn cung cấp: 1..15, 24..63) */
 const DN_WARDS_2025 = [
   // Đồng Nai
@@ -143,7 +144,6 @@ function applyCompassToDirection(){
 }
 
 /* ====== Phong thủy cốt lõi: cung mệnh, bát trạch, cảnh báo ====== */
-function parseDateParts(s){ if(!s||typeof s!=='string') throw new Error('Ngày sinh không hợp lệ'); s=s.trim(); const sep=s.includes('-')?'-':(s.includes('/')?'/':null); if(!sep) throw new Error('Định dạng ngày phải có "-" hoặc "/"'); const a=s.split(sep).map(x=>parseInt(x,10)); if(a.length!==3||a.some(isNaN)) throw new Error('Định dạng ngày không đúng'); if(a[0]>31) return {year:a[0],month:a[1],day:a[2]}; return {year:a[2],month:a[1],day:a[0]}; }
 function calculateNumerology(birth){
   const {year,month,day}=parseDateParts(birth);
   const sumDigits=n=>n.toString().split('').reduce((a,b)=>a+parseInt(b,10),0);
