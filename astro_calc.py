@@ -81,16 +81,16 @@ def compute_chart(info: BirthInfo) -> ChartData:
     is raised if the dependency is missing.
     """
 
-    if swe is None:  # pragma: no cover - dependency not available
-        raise RuntimeError(
-            "pyswisseph is required for compute_chart"  # noqa: TRY003 - simple runtime message
-        ) from _import_error
-
-       if info.birth_time is not None:
-        dt = datetime.combine(info.birth_date, info.birth_time.time())
-    else:
-        dt = datetime.combine(info.birth_date, time(12, 0))
-    jd = swe.julday(dt.year, dt.month, dt.day, dt.hour + dt.minute / 60.0)
+    if swe is None:  # pragma: no cover - dependency not available␊
+        raise RuntimeError(␊
+            "pyswisseph is required for compute_chart"  # noqa: TRY003 - simple runtime message␊
+        ) from _import_error␊
+␊
+    if info.birth_time is not None:
+        dt = datetime.combine(info.birth_date, info.birth_time.time())␊
+    else:␊
+        dt = datetime.combine(info.birth_date, time(12, 0))␊
+    jd = swe.julday(dt.year, dt.month, dt.day, dt.hour + dt.minute / 60.0)␊
 
     positions: Dict[str, PlanetPosition] = {}
     for name, pid in PLANETS.items():
@@ -103,4 +103,5 @@ def compute_chart(info: BirthInfo) -> ChartData:
         positions[name] = PlanetPosition(longitude=lon, sign=sign, degree=degree)
 
     return ChartData(planets=positions)
+
 
