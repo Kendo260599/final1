@@ -61,21 +61,23 @@ def main():
     ax.add_patch(arrow_n)
     ax.add_patch(arrow_s)
 
-    ax_slider = plt.axes([0.25, 0.05, 0.5, 0.03])
+        ax_slider = plt.axes([0.25, 0.05, 0.5, 0.03])
     slider = Slider(ax_slider, 'Góc', 0, 360, valinit=0)
+    heading_text = ax.text(0, -1.1, "0\u00b0", ha="center", va="center", fontsize=14)
 
     def update(val):
-        nonlocal arrow_n, arrow_s
+        nonlocal arrow_n, arrow_s, heading_text
         arrow_n.remove()
         arrow_s.remove()
         arrow_n, arrow_s = make_arrow(slider.val)
         ax.add_patch(arrow_n)
         ax.add_patch(arrow_s)
+        heading_text.set_text(f"{slider.val:.0f}\u00b0")
         fig.canvas.draw_idle()
 
     slider.on_changed(update)
     plt.show()
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":␊
     main()
