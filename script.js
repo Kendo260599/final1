@@ -87,6 +87,8 @@ const ISSUES = [
 ];
 
 /* ====== La bàn số ====== */
+const EARTHLY_BRANCHES=["Tý","Sửu","Dần","Mão","Thìn","Tỵ","Ngọ","Mùi","Thân","Dậu","Tuất","Hợi","Tý","Sửu","Dần","Mão","Thìn","Tỵ","Ngọ","Mùi","Thân","Dậu","Tuất","Hợi"];
+const TRIGRAMS=["Càn","Khảm","Cấn","Chấn","Tốn","Ly","Khôn","Đoài"];
 let compassActive=false, orientationHandler=null;
 const degNormalize=x=>{x=x%360; return x<0?x+360:x;};
 function degreeToDirection(deg){
@@ -105,6 +107,10 @@ function updateCompassUI(deg){
   const show=degNormalize(deg+offset);
   document.getElementById('compass-deg').textContent=show.toFixed(0);
   document.getElementById('compass-dir').textContent=degreeToDirection(show);
+    const branchIndex=Math.round(show/15)%EARTHLY_BRANCHES.length;
+  const trigramIndex=Math.round(show/45)%TRIGRAMS.length;
+  document.getElementById('compass-branch').textContent=EARTHLY_BRANCHES[branchIndex];
+  document.getElementById('compass-trigram').textContent=TRIGRAMS[trigramIndex];
   document.getElementById('needle').style.transform=`translate(-50%,-100%) rotate(${show}deg)`;
 }
 async function startCompass(){
