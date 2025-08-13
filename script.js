@@ -1,6 +1,7 @@
 /* ====== Danh sách Phường/Xã mới (95 đơn vị) tách theo Tỉnh ====== */
 import parseDateParts from "./parseDateParts.mjs";
 import parseDateParts from "./parseDateParts.js";
+import { ISSUES, detectIssues } from './siteIssues.mjs';
 /* 55 đơn vị thuộc Đồng Nai (theo thứ tự bạn cung cấp: 1..15, 24..63) */
 const DN_WARDS_2025 = [
   // Đồng Nai
@@ -330,14 +331,17 @@ function gatherInputs(){
   document.getElementById('bd-full-address').textContent=fullAddr||'—';
 
   const bds={province,ward,huyen,to,thua,addressDetail:detail,fullAddress:fullAddr,price,note};
-  const layout={
-    polygon:polygonPoints.map(p=>({x:p.x,y:p.y})),
-    center:centerPoint,
-    entrance:entrancePoint,
-    stair:stairPoint,
-    north:northRotation
-  };
-  return {name,phone,birth,gender,huong,yearX,monthX,bds,layout};
+  let layout=null;
+  if(polygonPoints.length||centerPoint||entrancePoint||stairPoint){
+    layout={
+      polygon:polygonPoints.map(p=>({x:p.x,y:p.y})),
+      center:centerPoint,
+      entrance:entrancePoint,
+      stair:stairPoint,
+      north:northRotation
+    };
+  }
+  return {name,phone,birth,gender,huong,yearX,monthX,bds,layout,issueIds:selectedIssueIds.slice()};
 }
 
 async function calculateHoroscope(birth, gender){
@@ -428,7 +432,7 @@ function saveProfile(currentResult){
   if(!i.monthX||i.monthX<1||i.monthX>12) return alert('Tháng xây không hợp lệ.');
   const R=currentResult||evaluateBuildTime(i.birth,i.gender,i.yearX,i.monthX);
   const numerology=calculateNumerology(i.birth);
-  const site=detectIssues(i.layout);
+  const site=i.layout?detectIssues(i.layout):{ids:i.issueIds||[]};
   const list=getProfiles(); const phoneKey=normalizePhone(i.phone); const idx=list.findIndex(p=>p.customer.phoneKey===phoneKey);
   const profile={
     id:idx>=0?list[idx].id:uuid(),
@@ -486,6 +490,7 @@ let centerPoint=null, entrancePoint=null, stairPoint=null;
 let northRotation=0;
 let dragTarget=null, mode='add';
 let canvas=null, ctx=null;
+let selectedIssueIds=[];
 
 function getMousePos(evt){
   const rect=canvas.getBoundingClientRect();
@@ -637,8 +642,37 @@ document.addEventListener('DOMContentLoaded', ()=>{
   });
 
   const issuesWrap=document.getElementById('issues-container');
-  if(issuesWrap) issuesWrap.innerHTML='<p class="muted">Chưa phân tích.</p>';
-
+   if(issuesWrap){
+    ISSUES.forEach(it=>{
+      const label=document.createElement('label');
+      label.className='issue-item';
+      const cb=document.createElement('input');
+      cb.type='checkbox';
+      cb.value=it.id;
+      cb.addEventListener('change',e=>{
+        if(e.target.checked){
+          if(!selectedIssueIds.includes(it.id)) selectedIssueIds.push(it.id);
+        }else{
+          selectedIssueIds=selectedIssueIds.filter(id=>id!==it.id);
+        }
+      });
+      label.appendChild(cb);
+      const span=document.createElement('span');
+      span.innerHTML=`<strong>[${it.cat}]</strong> ${it.label}`;
+      label.appendChild(span);
+      issuesWrap.appendChild(label);
+    });
+    const search=document.getElementById('issues-search');
+    if(search){
+      search.addEventListener('input',e=>{
+        const q=e.target.value.toLowerCase();
+        issuesWrap.querySelectorAll('.issue-item').forEach(lbl=>{
+          lbl.style.display=lbl.textContent.toLowerCase().includes(q)?'':'none';
+        });
+      });
+    }
+  }
+  
   // Compass
   document.getElementById('btn-compass-start').addEventListener('click',startCompass);
   document.getElementById('btn-compass-stop').addEventListener('click',stopCompass);
@@ -771,6 +805,7 @@ document.getElementById('profiles-tbody').addEventListener('click',e=>{
       document.getElementById('bd-full-address').textContent=p.bds.fullAddress||'—';
 
       renderResult(p.result,{...p.input,bds:p.bds,issueIds:p.input.issueIds||[]});
+      selectedIssueIds=(p.input.issueIds||[]).slice();
       const ad=document.getElementById('auspicious-days');
       if(ad){
         const days=getAuspiciousDays(p.input.birth,p.input.yearX,p.input.monthX);
