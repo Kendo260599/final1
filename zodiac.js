@@ -1,4 +1,4 @@
-const ZODIAC = [
+export const ZODIAC = [
   "Tý",
   "Sửu",
   "Dần",
@@ -13,14 +13,14 @@ const ZODIAC = [
   "Hợi",
 ];
 
-const idxZ = (y) => (((y - 4) % 12) + 12) % 12;
-const nameZ = (y) => ZODIAC[idxZ(y)];
+export const idxZ = (y) => (((y - 4) % 12) + 12) % 12;
+export const nameZ = (y) => ZODIAC[idxZ(y)];
 
-const TTG = [
+export const TTG = [
   { group: ["Thân", "Tý", "Thìn"], tamTai: ["Dần", "Mão", "Thìn"] },
   { group: ["Dần", "Ngọ", "Tuất"], tamTai: ["Thân", "Dậu", "Tuất"] },
   { group: ["Hợi", "Mão", "Mùi"], tamTai: ["Tỵ", "Ngọ", "Mùi"] },
   { group: ["Tỵ", "Dậu", "Sửu"], tamTai: ["Hợi", "Tý", "Sửu"] },
 ];
 
-module.exports = { ZODIAC, idxZ, nameZ, TTG };
+export default { ZODIAC, idxZ, nameZ, TTG };
