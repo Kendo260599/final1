@@ -189,4 +189,7 @@ module.exports = {
   solarToLunar,
   lunarToSolar,
 };
+// Provide a default export for ES module compatibility
+module.exports.default = module.exports;
+
 
