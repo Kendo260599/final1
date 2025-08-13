@@ -61,6 +61,42 @@ export const ISSUE_DETECTORS = {
     const poly = inputs.polygon || [];
     return poly.length === 3;
   },
+    lot_L: inputs => {
+    const poly = inputs.polygon || [];
+    if (poly.length < 5) return false;
+    const area = Math.abs(
+      poly.reduce((acc, p, i) => {
+        const q = poly[(i + 1) % poly.length];
+        return acc + p.x * q.y - q.x * p.y;
+      }, 0)
+    ) / 2;
+    const xs = poly.map(p => p.x);
+    const ys = poly.map(p => p.y);
+    const box = (Math.max(...xs) - Math.min(...xs)) * (Math.max(...ys) - Math.min(...ys));
+    return area < box * 0.9;
+  },
+  lot_trapezoid: inputs => {
+    const poly = inputs.polygon || [];
+    if (poly.length !== 4) return false;
+    const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+    const front = dist(poly[0], poly[1]);
+    const back = dist(poly[2], poly[3]);
+    return Math.abs(front - back) > 1;
+  },
+  lot_front_narrow: inputs => {
+    const poly = inputs.polygon || [];
+    if (poly.length !== 4) return false;
+    const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+    const front = dist(poly[0], poly[1]);
+    const back = dist(poly[2], poly[3]);
+    return front < back;
+  },
+  door_back: inputs => {
+    const f = inputs.entrance;
+    const b = inputs.backDoor;
+    if (!f || !b) return false;
+    return f.x === b.x || f.y === b.y;
+  },
   door_stair: inputs => {
     const d = inputs.entrance;
     const s = inputs.stair;
@@ -68,11 +104,21 @@ export const ISSUE_DETECTORS = {
     const dx = Math.abs(d.x - s.x);
     const dy = Math.abs(d.y - s.y);
     return dx < 10 || dy < 10;
+      },
+  door_wc: inputs => {
+    const d = inputs.entrance;
+    const w = inputs.wc;
+    if (!d || !w) return false;
+    const dx = Math.abs(d.x - w.x);
+    const dy = Math.abs(d.y - w.y);
+    return dx < 10 || dy < 10;
   }
 };
 
 ISSUES.forEach(issue => {
-  if (!ISSUE_DETECTORS[issue.id]) ISSUE_DETECTORS[issue.id] = () => false;
+  if (!ISSUE_DETECTORS[issue.id]) {
+    ISSUE_DETECTORS[issue.id] = inputs => Boolean(inputs[issue.id]);
+  }
 });
 
 export function detectIssues(inputs = {}) {
