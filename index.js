@@ -1,10 +1,37 @@
 const express = require("express");
 require("dotenv").config();
+const { spawn } = require("child_process");
+const path = require("path");
 
 const app = express();
 app.use(express.json());
 
 app.use(express.static(__dirname));
+
+app.get("/api/chart", (req, res) => {
+  const { name } = req.query;
+  if (!name) {
+    return res.status(400).json({ error: "Missing name" });
+  }
+  const dbPath = process.env.BIRTH_DB || "birth_info.db";
+  const script = path.join(__dirname, "chart_service.py");
+  const py = spawn("python", [script, dbPath, name]);
+  let out = "";
+  let err = "";
+  py.stdout.on("data", (d) => (out += d));
+  py.stderr.on("data", (d) => (err += d));
+  py.on("close", (code) => {
+    if (code !== 0) {
+      return res.status(500).json({ error: err || "Chart computation failed" });
+    }
+    try {
+      const data = JSON.parse(out);
+      res.json(data);
+    } catch (e) {
+      res.status(500).json({ error: "Invalid chart response" });
+    }
+  });
+});
 
 app.post("/api/ai-analyze", async (req, res) => {
   try {
@@ -99,8 +126,12 @@ app.get("/api/auspicious-days", async (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+  });
+}
+
+module.exports = app;
 
 
