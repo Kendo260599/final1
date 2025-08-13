@@ -3,6 +3,18 @@ require("dotenv").config();
 const { spawn } = require("child_process");
 const path = require("path");
 
+// helper fetchWithTimeout using AbortController
+async function fetchWithTimeout(url, options = {}, ms) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), ms);
+  try {
+    const response = await fetch(url, { ...options, signal: controller.signal });
+    return response;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 const app = express();
 app.use(express.json());
 
@@ -53,24 +65,29 @@ app.post("/api/ai-analyze", async (req, res) => {
     }
 
     const prompt = JSON.stringify(req.body);
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
+    const timeout = parseInt(process.env.AI_TIMEOUT_MS, 10) || 10000;
+    const response = await fetchWithTimeout(
+      "https://api.openai.com/v1/chat/completions",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          model: "gpt-3.5-turbo",
+          messages: [
+            { role: "system", content: "Bạn là chuyên gia phong thủy." },
+            {
+              role: "user",
+              content: `Hãy phân tích phong thủy dựa trên dữ liệu: ${prompt}`,
+            },
+          ],
+          temperature: 0.7,
+        }),
       },
-      body: JSON.stringify({
-        model: "gpt-3.5-turbo",
-        messages: [
-          { role: "system", content: "Bạn là chuyên gia phong thủy." },
-          {
-            role: "user",
-            content: `Hãy phân tích phong thủy dựa trên dữ liệu: ${prompt}`,
-          },
-        ],
-        temperature: 0.7,
-      }),
-    });
+      timeout
+    );
 
     if (!response.ok) {
       const errText = await response.text();
@@ -81,6 +98,9 @@ app.post("/api/ai-analyze", async (req, res) => {
     const text = data.choices && data.choices[0]?.message?.content?.trim();
     res.json({ text });
   } catch (err) {
+    if (err.name === "AbortError") {
+      return res.status(504).json({ error: "AI request timed out" });
+    }
     console.error(err);
     res.status(500).json({ error: "AI request failed" });
   }
@@ -99,21 +119,26 @@ app.get("/api/horoscope", async (req, res) => {
       return res.status(400).json({ error: "Invalid parameters" });
     }
     const prompt = `Sinh ngày ${birth}, giới tính ${gender}. Hãy phân tích tử vi gồm năm can chi, ngũ hành, cục, sao.`;
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
+    const timeout = parseInt(process.env.AI_TIMEOUT_MS, 10) || 10000;
+    const response = await fetchWithTimeout(
+      "https://api.openai.com/v1/chat/completions",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          model: "gpt-3.5-turbo",
+          messages: [
+            { role: "system", content: "Bạn là chuyên gia tử vi." },
+            { role: "user", content: prompt },
+          ],
+          temperature: 0.7,
+        }),
       },
-      body: JSON.stringify({
-        model: "gpt-3.5-turbo",
-        messages: [
-          { role: "system", content: "Bạn là chuyên gia tử vi." },
-          { role: "user", content: prompt },
-        ],
-        temperature: 0.7,
-      }),
-    });
+      timeout
+    );
     if (!response.ok) {
       const errText = await response.text();
       return res.status(500).json({ error: errText });
@@ -150,6 +175,7 @@ if (require.main === module) {
 }
 
 module.exports = app;
+
 
 
 
