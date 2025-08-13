@@ -167,16 +167,16 @@ function convertSolar2Lunar(dd, mm, yy, timeZone) {
   return { lunarDay, lunarMonth, lunarYear, lunarLeap };
 }
 
-// Public API
-function solarToLunar(dateObj) {
+// Public API␊
+export function solarToLunar(dateObj) {
   const d = dateObj.day !== undefined ? dateObj.day : dateObj.getDate();
   const m = dateObj.month !== undefined ? dateObj.month : dateObj.getMonth() + 1;
   const y = dateObj.year !== undefined ? dateObj.year : dateObj.getFullYear();
   const res = convertSolar2Lunar(d, m, y, 7);
   return { day: res.lunarDay, month: res.lunarMonth, year: res.lunarYear, leap: res.lunarLeap };
-}
-
-function lunarToSolar(dateObj) {
+}␊
+␊
+export function lunarToSolar(dateObj) {
   const d = dateObj.day;
   const m = dateObj.month;
   const y = dateObj.year;
@@ -185,11 +185,7 @@ function lunarToSolar(dateObj) {
   return { day: res.day, month: res.month, year: res.year };
 }
 
-module.exports = {
-  solarToLunar,
-  lunarToSolar,
-};
-// Provide a default export for ES module compatibility
-module.exports.default = module.exports;
+export default { solarToLunar, lunarToSolar };
+
 
 
