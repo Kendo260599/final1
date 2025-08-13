@@ -1,6 +1,8 @@
 from datetime import date, datetime
+
 import astro_calc
 from storage import BirthInfo
+
 
 def test_birth_time_affects_positions(monkeypatch):
     class DummySwe:
