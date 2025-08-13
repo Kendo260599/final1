@@ -47,14 +47,21 @@ will apply the migration automatically.
 
    Biến `AI_API_KEY` dùng để xác thực với dịch vụ AI cho các tính năng liên quan. Việc sử dụng khóa này có thể chịu giới hạn hoặc phát sinh chi phí tùy theo nhà cung cấp.
 
-2. Cài đặt phụ thuộc và chạy server:
+2. (Tuỳ chọn) Chỉ định đường dẫn database bằng biến môi trường `BIRTH_DB` (mặc định `birth_info.db`):
+
+   ```bash
+   export BIRTH_DB="my_birth.db"
+   sqlite3 "$BIRTH_DB" < schema.sql
+   ```
+
+3. Cài đặt phụ thuộc và chạy server:
 
    ```bash
    npm install
    npm start
    ```
 
-3. (Tuỳ chọn) Chạy test:
+4. (Tuỳ chọn) Chạy test:
 
    ```bash
    npm test
