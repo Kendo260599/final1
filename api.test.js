@@ -63,3 +63,58 @@ test('GET /api/auspicious-days returns day list', async () => {
   assert.ok(data.days.every(d => Number.isInteger(d) && d >= 1 && d <= 31));
   server.close();
 });
+
+test('POST /api/ai-analyze returns text when body valid', async () => {
+  process.env.AI_API_KEY = 'test-key';
+  const originalFetch = global.fetch;
+  global.fetch = async (url, options) => {
+    if (String(url).includes('api.openai.com')) {
+      return {
+        ok: true,
+        json: async () => ({ choices: [{ message: { content: 'Mocked AI' } }] }),
+      };
+    }
+    return originalFetch(url, options);
+  };
+  const { server, url } = await startServer();
+  const res = await fetch(`${url}/api/ai-analyze`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text: 'hello' }),
+  });
+  assert.strictEqual(res.status, 200);
+  const data = await res.json();
+  assert.strictEqual(data.text, 'Mocked AI');
+  server.close();
+  global.fetch = originalFetch;
+  delete process.env.AI_API_KEY;
+});
+
+test('POST /api/ai-analyze returns 400 for invalid body', async () => {
+  process.env.AI_API_KEY = 'test-key';
+  const { server, url } = await startServer();
+  const res = await fetch(`${url}/api/ai-analyze`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({}),
+  });
+  assert.strictEqual(res.status, 400);
+  const data = await res.json();
+  assert.strictEqual(data.error, 'Invalid body');
+  server.close();
+  delete process.env.AI_API_KEY;
+});
+
+test('POST /api/ai-analyze errors without API key', async () => {
+  delete process.env.AI_API_KEY;
+  const { server, url } = await startServer();
+  const res = await fetch(`${url}/api/ai-analyze`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text: 'hi' }),
+  });
+  assert.strictEqual(res.status, 500);
+  const data = await res.json();
+  assert.strictEqual(data.error, 'Missing AI_API_KEY');
+  server.close();
+});
