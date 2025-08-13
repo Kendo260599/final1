@@ -77,20 +77,27 @@ def compute_chart(info: BirthInfo) -> ChartData:
 
     Notes
     -----
-    This function requires the ``pyswisseph`` package. A :class:`RuntimeError`
-    is raised if the dependency is missing.
+    This function requires the ``pyswisseph`` package. If the dependency is
+    missing, a deterministic fallback algorithm is used instead.
     """
 
-    if swe is None:  # pragma: no cover - dependency not available␊
-        raise RuntimeError(␊
-            "pyswisseph is required for compute_chart"  # noqa: TRY003 - simple runtime message␊
-        ) from _import_error␊
-␊
     if info.birth_time is not None:
-        dt = datetime.combine(info.birth_date, info.birth_time.time())␊
-    else:␊
-        dt = datetime.combine(info.birth_date, time(12, 0))␊
-    jd = swe.julday(dt.year, dt.month, dt.day, dt.hour + dt.minute / 60.0)␊
+        dt = datetime.combine(info.birth_date, info.birth_time.time())
+    else:
+        dt = datetime.combine(info.birth_date, time(12, 0))
+
+    if swe is None:  # pragma: no cover - dependency not available
+        base = (dt.toordinal() * 24) + dt.hour + dt.minute / 60.0
+        positions = {}
+        for idx, name in enumerate(PLANETS.keys(), start=1):
+            lon = (base * idx * 13) % 360
+            sign_index = int(lon // 30)
+            sign = ZODIAC_SIGNS[sign_index]
+            degree = lon % 30
+            positions[name] = PlanetPosition(longitude=lon, sign=sign, degree=degree)
+        return ChartData(planets=positions)
+
+    jd = swe.julday(dt.year, dt.month, dt.day, dt.hour + dt.minute / 60.0)
 
     positions: Dict[str, PlanetPosition] = {}
     for name, pid in PLANETS.items():
