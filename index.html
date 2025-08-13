@@ -267,6 +267,12 @@
   <script type="module" src="public/compass.js"></script>
   <script type="module" src="public/horoscope.js"></script>
   <script type="module" src="public/profiles.js"></script>
-  <script type="module" src="script.js"></script>
+    <script type="module">
+    if (document.getElementById('issues-container')) {
+      import('./script.js').catch(err => console.error('Failed to load script.js', err));
+    } else {
+      console.error('Missing #issues-container; script.js not loaded.');
+    }
+  </script>
 </body>
 </html>
