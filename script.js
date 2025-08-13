@@ -762,6 +762,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
         if(!ym) return alert('Vui lòng chọn tháng.');
         let [y,m]=ym.split('-').map(Number);
         ({year:y,month:m}=ensureSolarMonth(y,m));
+        const days = getAuspiciousDays(birth, y, m);
         const el=document.getElementById('auspicious-days');
         if(el) el.innerHTML = days.length?`<strong>Ngày đẹp:</strong> ${days.join(', ')}`:'Không có ngày phù hợp.';
       }catch(err){ alert('Lỗi: '+(err.message||err)); }
