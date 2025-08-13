@@ -369,6 +369,11 @@ async function calculateHoroscope(birth, gender){
   return result;
 }
 
+async function fetchChart(name){
+  const res=await fetch(`/api/chart?name=${encodeURIComponent(name)}`);
+  return await res.json();
+}
+
 async function renderResult(R,i){
   const dir=analyzeHouseDirection(R.cung.cung,i.huong);
   const site=checkSiteIssues(i.layout || i.issueIds || []);
@@ -741,6 +746,18 @@ document.addEventListener('DOMContentLoaded', ()=>{
       if(data.sao) html+=`<p><strong>Sao:</strong> ${data.sao}</p>`;
       if(data.text) html+=`<p>${data.text}</p>`;
       el.innerHTML=html;
+    });
+  }
+
+  const btnChart=document.getElementById('btn-chart');
+  if(btnChart){
+    btnChart.addEventListener('click',async()=>{
+      const name=document.getElementById('chart-name').value.trim();
+      if(!name) return alert('Vui lòng nhập tên.');
+      const data=await fetchChart(name);
+      const el=document.getElementById('chart-result');
+      if(data.error){ el.textContent=data.error; return; }
+      el.innerHTML=Object.entries(data.planets).map(([p,pos])=>`${p}: ${pos.sign} ${pos.degree.toFixed(2)}`).join('<br>');
     });
   }
 
