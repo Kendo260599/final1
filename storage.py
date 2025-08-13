@@ -20,8 +20,8 @@ class BirthInfo:
     birth_time: Optional[datetime] = None
 
 
-class BirthInfoRepository:␊
-    """Persistence layer for :class:`BirthInfo` using SQLite."""␊
+class BirthInfoRepository:
+    """Persistence layer for :class:`BirthInfo` using SQLite."""
 
     def __init__(self, db_path: str = ":memory:") -> None:
         self._conn = sqlite3.connect(db_path)
@@ -139,6 +139,7 @@ class BirthInfoRepository:␊
 
     def __exit__(self, exc_type, exc, tb) -> None:
         self.close()
+
 
 
 
