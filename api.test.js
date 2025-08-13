@@ -118,3 +118,35 @@ test('POST /api/ai-analyze errors without API key', async () => {
   assert.strictEqual(data.error, 'Missing AI_API_KEY');
   server.close();
 });
+
+test('POST /api/ai-analyze returns timeout error when OpenAI unresponsive', async () => {
+  process.env.AI_API_KEY = 'test-key';
+  process.env.AI_TIMEOUT_MS = '10';
+  const originalFetch = global.fetch;
+  global.fetch = (url, options) => {
+    if (String(url).includes('api.openai.com')) {
+      return new Promise((resolve, reject) => {
+        options.signal.addEventListener('abort', () => {
+          const err = new Error('aborted');
+          err.name = 'AbortError';
+          reject(err);
+        });
+      });
+    }
+    return originalFetch(url, options);
+  };
+
+  const { server, url } = await startServer();
+  const res = await fetch(`${url}/api/ai-analyze`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text: 'hello' }),
+  });
+  assert.strictEqual(res.status, 504);
+  const data = await res.json();
+  assert.strictEqual(data.error, 'AI request timed out');
+  server.close();
+  global.fetch = originalFetch;
+  delete process.env.AI_API_KEY;
+  delete process.env.AI_TIMEOUT_MS;
+});
