@@ -1,6 +1,7 @@
 /* ====== Danh sách Phường/Xã mới (95 đơn vị) tách theo Tỉnh ====== */
 import parseDateParts from "./parseDateParts.mjs";
 import { ISSUES, detectIssues } from './siteIssues.mjs';
+import { computeCanChiAndStars } from './advancedHoroscope.mjs';
 /* 55 đơn vị thuộc Đồng Nai (theo thứ tự bạn cung cấp: 1..15, 24..63) */
 const DN_WARDS_2025 = [
   // Đồng Nai
@@ -372,8 +373,14 @@ async function renderResult(R,i){
   const dir=analyzeHouseDirection(R.cung.cung,i.huong);
   const site=checkSiteIssues(i.layout || i.issueIds || []);
   const num=calculateNumerology(i.birth);
+  const adv=computeCanChiAndStars(i.birth);
   let html='';
-  html+=`<div class="ket-luan"><div><span class="badge">Cung mệnh</span> <strong>${R.cung.cung}</strong> — Ngũ hành: <strong>${R.cung.nguyenTo}</strong> — Nhóm: <strong>${R.cung.nhomTrach}</strong></div><div><span class="badge">Thần số học</span> <strong>${num.number}</strong> — ${num.meaning}</div></div>`;
+  html+=`<div class="ket-luan">
+    <div><span class="badge">Cung mệnh</span> <strong>${R.cung.cung}</strong> — Ngũ hành: <strong>${R.cung.nguyenTo}</strong> — Nhóm: <strong>${R.cung.nhomTrach}</strong></div>
+    <div><span class="badge">Thần số học</span> <strong>${num.number}</strong> — ${num.meaning}</div>
+    <div><span class="badge">Can chi</span> Tháng: <strong>${adv.canChi.month}</strong> — Ngày: <strong>${adv.canChi.day}</strong> — Giờ: <strong>${adv.canChi.hour}</strong></div>
+    <div><span class="badge">Sao chính</span> Tử Vi: <strong>${adv.stars['Tử Vi']}</strong> — Thiên Phủ: <strong>${adv.stars['Thiên Phủ']}</strong> — Cung mệnh: <strong>${adv.cungMenh}</strong></div>
+  </div>`;
   html+=`<h3 class="block-title">Hướng nhà: ${i.huong} <span class="tag ${dir.selected?.loai||'warn'}">${dir.selected?.ten||'—'}</span></h3>`;
   if(dir.selected){
     const adv = dir.selected.loai==='good'
