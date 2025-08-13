@@ -1,10 +1,6 @@
 import lunar from './lunar.js';
 import zodiac from './zodiac.js';
-import elements from './elements.js';
-
 const { solarToLunar } = lunar;
-const { ZODIAC } = zodiac;
-const { elemYear } = elements;
 
 const CAN = ['Giáp','Ất','Bính','Đinh','Mậu','Kỷ','Canh','Tân','Nhâm','Quý'];
 const CHI = ['Tý','Sửu','Dần','Mão','Thìn','Tỵ','Ngọ','Mùi','Thân','Dậu','Tuất','Hợi'];
