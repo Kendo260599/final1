@@ -40,6 +40,15 @@ app.post("/api/ai-analyze", async (req, res) => {
       return res.status(500).json({ error: "Missing AI_API_KEY" });
     }
 
+    if (
+      !req.body ||
+      typeof req.body !== "object" ||
+      Array.isArray(req.body) ||
+      typeof req.body.text !== "string"
+    ) {
+      return res.status(400).json({ error: "Invalid body" });
+    }
+
     const prompt = JSON.stringify(req.body);
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
@@ -138,6 +147,7 @@ if (require.main === module) {
 }
 
 module.exports = app;
+
 
 
 
