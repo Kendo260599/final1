@@ -5,6 +5,15 @@ import { computeCanChiAndStars } from './advancedHoroscope.mjs';
 import { getWardsForProvince } from './wards.mjs';
 import getAuspiciousDays from './getAuspiciousDays.mjs';
 import lunar from './lunar.js';
+import {
+  getEffectiveBirthYear,
+  tuoiMu,
+  checkKimLau,
+  checkHoangOc,
+  checkTamTai,
+  checkXungTuoi,
+} from './fortune.mjs';
+import { elemYear, elemConflict } from './elements.js';
 const { solarToLunar, lunarToSolar } = lunar;
 
 /* ====== La bàn số ====== */
@@ -85,7 +94,6 @@ function calculateNumerology(birth){
   };
   return {number:total,meaning:meanings[total]||''};
 }
-function getEffectiveBirthYear(b){ const {year,month,day}=parseDateParts(b); if(month<3||(month===3&&day<=13)) return year-1; return year; }
 const MALE_START=1921, FEMALE_START=1922;
 const MALE_SEQ=['Đoài','Càn','Khôn','Tốn','Chấn','Khôn','Khảm','Ly','Cấn']; const FEMALE_SEQ=['Cấn','Khảm','Ly','Tốn','Chấn','Khôn','Càn','Đoài','Cấn']; const mod9=n=>((n%9)+9)%9;
 function getCungMenh(birth,gender){
@@ -110,16 +118,6 @@ function getBatTrachForCung(cung){
   return B[cung];
 }
 function analyzeHouseDirection(cung,huong){ const t=getBatTrachForCung(cung); const all=Object.entries(t).map(([h,i])=>({huong:h,...i})); return {selected:t[huong],goods:all.filter(i=>i.loai==='good'),bads:all.filter(i=>i.loai==='bad')}; }
-const ZODIAC=['Tý','Sửu','Dần','Mão','Thìn','Tỵ','Ngọ','Mùi','Thân','Dậu','Tuất','Hợi']; const idxZ=y=>((y-4)%12+12)%12; const nameZ=y=>ZODIAC[idxZ(y)];
-const TTG=[{group:['Thân','Tý','Thìn'],tamTai:['Dần','Mão','Thìn']},{group:['Dần','Ngọ','Tuất'],tamTai:['Thân','Dậu','Tuất']},{group:['Hợi','Mão','Mùi'],tamTai:['Tỵ','Ngọ','Mùi']},{group:['Tỵ','Dậu','Sửu'],tamTai:['Hợi','Tý','Sửu']}];
-function tuoiMu(eff,year){return year-eff+1}
-function checkKimLau(t){let r=t%9;if(r===0)r=9;const m={1:'Kim Lâu Thân',3:'Kim Lâu Thê',6:'Kim Lâu Tử',8:'Kim Lâu Lục Súc'};return {isKimLau:[1,3,6,8].includes(r),type:m[r]||null}}
-function checkHoangOc(t){const lb=['Nhất Cát','Nhì Nghi','Tam Địa Sát','Tứ Tấn Tài','Ngũ Thọ Tử','Lục Hoang Ốc'];const m=t%6;const i=(m===0)?5:m-1;const n=lb[i];return {name:n,isBad:['Tam Địa Sát','Ngũ Thọ Tử','Lục Hoang Ốc'].includes(n)}}
-function checkTamTai(ownerYear,year){const o=nameZ(ownerYear),c=nameZ(year),g=TTG.find(x=>x.group.includes(o));return {isTamTai:g?g.tamTai.includes(c):false,yearChi:c}}
-function checkXungTuoi(ownerYear,year){const opp=(idxZ(ownerYear)+6)%12;return {isXung:idxZ(year)===opp,opp:ZODIAC[opp],yearChi:nameZ(year)}}
-function elemYear(y){const s=((y-4)%10+10)%10; if(s===0||s===1)return'Mộc'; if(s===2||s===3)return'Hỏa'; if(s===4||s===5)return'Thổ'; if(s===6||s===7)return'Kim'; return'Thủy';}
-const KHAC={'Mộc':'Thổ','Thổ':'Thủy','Thủy':'Hỏa','Hỏa':'Kim','Kim':'Mộc'};
-function elemConflict(a,b){return a&&b&&(KHAC[a]===b||KHAC[b]===a)}
 function evaluateBuildTime(birth,gender,year,month){
   const cung=getCungMenh(birth,gender); const age=tuoiMu(cung.effectiveYear,year);
   const kl=checkKimLau(age), ho=checkHoangOc(age), tt=checkTamTai(cung.effectiveYear,year), x=checkXungTuoi(cung.effectiveYear,year);
