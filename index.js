@@ -158,15 +158,12 @@ app.get("/api/auspicious-days", async (req, res) => {
     const { birth, year, month } = req.query;
     const y = parseInt(year, 10),
       m = parseInt(month, 10);
-    if (
-      !birth ||
-      Number.isNaN(y) ||
-      Number.isNaN(m) ||
-      y <= 0 ||
-      m < 1 ||
-      m > 12
-    )
+    if (!birth || Number.isNaN(y) || Number.isNaN(m)) {
       return res.status(400).json({ error: "Missing params" });
+    }
+    if (y <= 0 || m < 1 || m > 12) {
+      return res.status(400).json({ error: "Invalid params" });
+    }
     const days = getAuspiciousDays(birth, y, m);
     res.json({ days });
   } catch (err) {
