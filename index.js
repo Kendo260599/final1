@@ -26,6 +26,9 @@ app.get("/api/chart", (req, res) => {
     }
     try {
       const data = JSON.parse(out);
+      if (data.error === "not found") {
+        return res.status(404).json({ error: "not found" });
+      }
       res.json(data);
     } catch (e) {
       res.status(500).json({ error: "Invalid chart response" });
@@ -147,6 +150,7 @@ if (require.main === module) {
 }
 
 module.exports = app;
+
 
 
 
