@@ -54,14 +54,20 @@ will apply the migration automatically.
    sqlite3 "$BIRTH_DB" < schema.sql
    ```
 
-3. Cài đặt phụ thuộc và chạy server:
+3. (Tuỳ chọn) Chỉ định trình thông dịch Python bằng biến môi trường `PYTHON` (mặc định `python3`):
+
+   ```bash
+   export PYTHON="/path/to/python"
+   ```
+
+4. Cài đặt phụ thuộc và chạy server:
 
    ```bash
    npm install
    npm start
    ```
 
-4. (Tuỳ chọn) Chạy test:
+5. (Tuỳ chọn) Chạy test:
 
    ```bash
    npm test
