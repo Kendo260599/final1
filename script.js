@@ -2,33 +2,7 @@
 import parseDateParts from "./parseDateParts.mjs";
 import { ISSUES, detectIssues } from './siteIssues.mjs';
 import { computeCanChiAndStars } from './advancedHoroscope.mjs';
-/* 55 đơn vị thuộc Đồng Nai (theo thứ tự bạn cung cấp: 1..15, 24..63) */
-const DN_WARDS_2025 = [
-  // Đồng Nai
-  'Phường Trấn Biên','Phường Biên Hòa','Phường Tam Hiệp','Phường Long Bình','Phường Hố Nai','Phường Trảng Dài','Phường Long Hưng','Phường Phước Tân','Phường Tam Phước','Phường Tân Triều',
-  'Phường Long Khánh','Phường Bảo Vinh','Phường Xuân Lập','Phường Hàng Gòn','Phường Bình Lộc',
-  'Xã Trị An','Xã Tân An','Xã Phú Lý',
-  'Xã Trảng Bom','Xã An Viễn','Xã Bàu Hàm','Xã Bình Minh','Xã Hưng Thịnh',
-  'Xã Dầu Giây','Xã Gia Kiệm','Xã Thống Nhất',
-  'Xã La Ngà','Xã Định Quán','Xã Phú Hòa','Xã Thanh Sơn','Xã Phú Vinh',
-  'Xã Tân Phú','Xã Phú Lâm','Xã Tà Lài','Xã Nam Cát Tiên','Xã Đak Lua',
-  'Xã Xuân Lộc','Xã Xuân Hòa','Xã Xuân Phú','Xã Xuân Thành','Xã Xuân Định','Xã Xuân Bắc',
-  'Xã Cẩm Mỹ','Xã Sông Ray','Xã Xuân Đông','Xã Xuân Quế','Xã Xuân Đường',
-  'Xã Long Thành','Xã Phước Thái','Xã Long Phước','Xã Bình An','Xã An Phước',
-  'Xã Nhơn Trạch','Xã Đại Phước','Xã Phước An'
-];
-
-/* 40 đơn vị thuộc Bình Phước (16..23, 64..95) */
-const BP_WARDS_2025 = [
-  'Phường Bình Phước','Phường Đồng Xoài','Phường Phước Bình','Phường Phước Long','Phường Bình Long','Phường An Lộc','Phường Minh Hưng','Phường Chơn Thành',
-  'Xã Nha Bích','Xã Tân Quan','Xã Tân Hưng','Xã Tân Khai','Xã Minh Đức',
-  'Xã Lộc Thành','Xã Lộc Ninh','Xã Lộc Hưng','Xã Lộc Tấn','Xã Lộc Thạnh','Xã Lộc Quang',
-  'Xã Tân Tiến','Xã Thiện Hưng','Xã Hưng Phước','Xã Phú Nghĩa','Xã Đa Kia','Xã Đăk Ơ','Xã Bù Gia Mập',
-  'Xã Bình Tân','Xã Long Hà','Xã Phú Riềng','Xã Phú Trung',
-  'Xã Thuận Lợi','Xã Đồng Tâm','Xã Tân Lợi','Xã Đồng Phú',
-  'Xã Phước Sơn','Xã Nghĩa Trung','Xã Bù Đăng','Xã Thọ Sơn','Xã Đak Nhau','Xã Bom Bo'
-];
-
+import { getWardsForProvince } from './wards.mjs';
 
 /* ====== La bàn số ====== */
 const EARTHLY_BRANCHES=["Tý","Sửu","Dần","Mão","Thìn","Tỵ","Ngọ","Mùi","Thân","Dậu","Tuất","Hợi","Tý","Sửu","Dần","Mão","Thìn","Tỵ","Ngọ","Mùi","Thân","Dậu","Tuất","Hợi"];
@@ -179,7 +153,7 @@ function getAuspiciousDays(birth,year,month){
 function populateWardsForProvince(){
   const prov=document.getElementById('bd-province').value;
   const sel=document.getElementById('bd-ward');
-  const wards=(prov==='Đồng Nai'?DN_WARDS_2025:BP_WARDS_2025);
+  const wards=getWardsForProvince(prov);
   const opts=wards.map(w=>`<option value="${w}">${w}</option>`);
   opts.push('<option value="__other__">Khác (nhập tay)</option>');
   sel.innerHTML=opts.join('');
@@ -644,7 +618,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
     const custom=document.getElementById('bd-ward-custom').value.trim();
     if(!custom) return alert('Nhập tên phường/xã.');
     // Lưu bổ sung tạm thời vào danh sách của tỉnh hiện tại
-    if(prov==='Đồng Nai') DN_WARDS_2025.push(custom); else BP_WARDS_2025.push(custom);
+    getWardsForProvince(prov).push(custom);
     populateWardsForProvince();
     document.getElementById('bd-ward').value=custom;
     document.getElementById('ward-custom-wrap').style.display='none';
@@ -815,7 +789,7 @@ document.getElementById('profiles-tbody').addEventListener('click',e=>{
 
       document.getElementById('bd-province').value=p.bds.province||'Đồng Nai';
       populateWardsForProvince();
-      const wards=(p.bds.province==='Bình Phước'?BP_WARDS_2025:DN_WARDS_2025);
+      const wards=getWardsForProvince(p.bds.province);
       if(wards.includes(p.bds.ward)){ document.getElementById('bd-ward').value=p.bds.ward; document.getElementById('ward-custom-wrap').style.display='none'; }
       else { document.getElementById('bd-ward').value='__other__'; document.getElementById('ward-custom-wrap').style.display='block'; document.getElementById('bd-ward-custom').value=p.bds.ward||''; }
       const huyenEl=document.getElementById('bd-huyen');
