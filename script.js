@@ -1,6 +1,6 @@
 /* ====== Danh sách Phường/Xã mới (95 đơn vị) tách theo Tỉnh ====== */
 import parseDateParts from "./parseDateParts.mjs";
-import { ISSUES, detectIssues } from "./siteIssues.mjs";
+import parseDateParts from "./parseDateParts.js";
 /* 55 đơn vị thuộc Đồng Nai (theo thứ tự bạn cung cấp: 1..15, 24..63) */
 const DN_WARDS_2025 = [
   // Đồng Nai
