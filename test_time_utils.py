@@ -1,6 +1,6 @@
-from datetime import datetime
 import os
-import sys
+from datetime import datetime
+import sys␊
 
 # Ensure the project root is on sys.path so ``time_utils`` can be imported when
 # tests are executed from within the ``tests`` directory.
@@ -36,3 +36,4 @@ def test_to_utc_invalid_timezone():
     dt_local = datetime(2024, 1, 1, 12, 0)
     with pytest.raises(ValueError, match="Unknown timezone: Invalid/Timezone"):
         to_utc(dt_local, "Invalid/Timezone")
+
