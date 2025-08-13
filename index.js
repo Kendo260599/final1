@@ -81,7 +81,12 @@ app.get("/api/horoscope", async (req, res) => {
       return res.status(500).json({ error: "Missing AI_API_KEY" });
     }
     const { birth, gender } = req.query;
-    const prompt = `Sinh ngày ${birth || ""}, giới tính ${gender || ""}. Hãy phân tích tử vi gồm năm can chi, ngũ hành, cục, sao.`;
+    const birthRegex = /^\d{4}-\d{2}-\d{2}$/;
+    const allowedGenders = new Set(["nam", "nu", "khac"]);
+    if (!birthRegex.test(birth) || !allowedGenders.has(gender)) {
+      return res.status(400).json({ error: "Invalid parameters" });
+    }
+    const prompt = `Sinh ngày ${birth}, giới tính ${gender}. Hãy phân tích tử vi gồm năm can chi, ngũ hành, cục, sao.`;
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -133,5 +138,6 @@ if (require.main === module) {
 }
 
 module.exports = app;
+
 
 
