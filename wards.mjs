@@ -1,4 +1,5 @@
 export const WARDS = {
+  // Dữ liệu cục bộ tối thiểu; danh sách đầy đủ sẽ được nạp qua loadWardsFromUrl
   'Đồng Nai': [
     'Phường Trấn Biên','Phường Biên Hòa','Phường Tam Hiệp','Phường Long Bình','Phường Hố Nai','Phường Trảng Dài','Phường Long Hưng','Phường Phước Tân','Phường Tam Phước','Phường Tân Triều',
     'Phường Long Khánh','Phường Bảo Vinh','Phường Xuân Lập','Phường Hàng Gòn','Phường Bình Lộc',
@@ -22,6 +23,22 @@ export const WARDS = {
     'Xã Phước Sơn','Xã Nghĩa Trung','Xã Bù Đăng','Xã Thọ Sơn','Xã Đak Nhau','Xã Bom Bo'
   ]
 };
+
+/**
+ * Nạp thêm dữ liệu phường/xã từ một URL JSON và gộp vào WARDS.
+ * Nếu tải thất bại sẽ giữ nguyên dữ liệu cục bộ.
+ */
+export async function loadWardsFromUrl(url = 'wards.json') {
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    Object.assign(WARDS, data);
+  } catch (err) {
+    console.error('Failed to load wards', err);
+  }
+  return WARDS;
+}
 
 export function getWardsForProvince(province){
   if(!WARDS[province]) WARDS[province]=[];
