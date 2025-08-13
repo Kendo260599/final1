@@ -11,6 +11,9 @@ const DB_PATH = 'chart_test.db';
 spawnSync('python', ['-c', `from storage import BirthInfoRepository; from validate import validate; repo=BirthInfoRepository('${DB_PATH}'); repo.save(validate('Alice','2000-01-01')); repo.close()`]);
 
 process.env.BIRTH_DB = DB_PATH;
+test.after(() => {
+  fs.unlinkSync(DB_PATH);
+});
 
 test('GET /api/chart returns planets', async () => {
   const server = http.createServer(app);
@@ -22,5 +25,15 @@ test('GET /api/chart returns planets', async () => {
   assert.ok(data.planets);
   assert.ok(typeof data.planets.Sun.sign === 'string');
   server.close();
-  fs.unlinkSync(DB_PATH);
+});
+
+test('GET /api/chart with unknown name returns 404', async () => {
+  const server = http.createServer(app);
+  await new Promise(resolve => server.listen(0, resolve));
+  const port = server.address().port;
+  const res = await fetch(`http://127.0.0.1:${port}/api/chart?name=Bob`);
+  assert.strictEqual(res.status, 404);
+  const data = await res.json();
+  assert.deepStrictEqual(data, { error: 'not found' });
+  server.close();
 });
