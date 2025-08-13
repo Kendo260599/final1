@@ -268,8 +268,6 @@ async function getAiAnalysis(payload){
   return res.json();
 }
 
-}
-
 /* ====== Vẽ đa giác nền nhà ====== */
 const polygonPoints=[];
 let centerPoint=null, entrancePoint=null, stairPoint=null;
