@@ -2,7 +2,7 @@
 import parseDateParts from "./parseDateParts.mjs";
 import { ISSUES, detectIssues } from './siteIssues.mjs';
 import { computeCanChiAndStars } from './advancedHoroscope.mjs';
-import { getWardsForProvince } from './wards.mjs';
+import { getWardsForProvince, loadWardsFromUrl } from './wards.mjs';
 import getAuspiciousDays from './getAuspiciousDays.mjs';
 import lunar from './lunar.js';
 import {
@@ -541,10 +541,13 @@ function redrawCanvas(){
 }
 
 /* ====== Sự kiện UI ====== */
-document.addEventListener('DOMContentLoaded', ()=>{
+document.addEventListener('DOMContentLoaded', async ()=>{
     initCanvasDrawing();
   // Province -> Wards
   document.getElementById('bd-province').addEventListener('change',populateWardsForProvince);
+  populateWardsForProvince();
+  // Nạp thêm dữ liệu phường và cập nhật lại danh sách
+  await loadWardsFromUrl().catch(()=>{});
   populateWardsForProvince();
 
     const birthEl=document.getElementById('ngay-sinh');
