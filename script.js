@@ -429,26 +429,31 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   });
 
   const issuesWrap=document.getElementById('issues-container');
-   if(issuesWrap){
-    ISSUES.forEach(it=>{
-      const label=document.createElement('label');
-      label.className='issue-item';
-      const cb=document.createElement('input');
-      cb.type='checkbox';
-      cb.value=it.id;
-      cb.addEventListener('change',e=>{
-        if(e.target.checked){
-          if(!selectedIssueIds.includes(it.id)) selectedIssueIds.push(it.id);
-        }else{
-          selectedIssueIds=selectedIssueIds.filter(id=>id!==it.id);
-        }
+  if(issuesWrap){
+    try{
+      ISSUES.forEach(it=>{
+        const label=document.createElement('label');
+        label.className='issue-item';
+        const cb=document.createElement('input');
+        cb.type='checkbox';
+        cb.value=it.id;
+        cb.addEventListener('change',e=>{
+          if(e.target.checked){
+            if(!selectedIssueIds.includes(it.id)) selectedIssueIds.push(it.id);
+          }else{
+            selectedIssueIds=selectedIssueIds.filter(id=>id!==it.id);
+          }
+        });
+        label.appendChild(cb);
+        const span=document.createElement('span');
+        span.innerHTML=`<strong>[${it.cat}]</strong> ${it.label}`;
+        label.appendChild(span);
+        issuesWrap.appendChild(label);
       });
-      label.appendChild(cb);
-      const span=document.createElement('span');
-      span.innerHTML=`<strong>[${it.cat}]</strong> ${it.label}`;
-      label.appendChild(span);
-      issuesWrap.appendChild(label);
-    });
+    }catch(err){
+      console.error('Failed to render issues:', err);
+      issuesWrap.innerHTML='<div class="error">Không thể tải danh sách lỗi phong thủy.</div>';
+    }
     const search=document.getElementById('issues-search');
     if(search){
       search.addEventListener('input',e=>{
@@ -458,6 +463,12 @@ document.addEventListener('DOMContentLoaded', async ()=>{
         });
       });
     }
+      }else{
+    console.error('Missing #issues-container in DOM.');
+    const errDiv=document.createElement('div');
+    errDiv.className='error';
+    errDiv.textContent='Không tìm thấy vùng hiển thị lỗi phong thủy.';
+    document.body.appendChild(errDiv);
   }
   
   // Compass
