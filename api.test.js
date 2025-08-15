@@ -105,19 +105,19 @@ test('POST /api/ai-analyze returns 400 for invalid body', async () => {
   delete process.env.AI_API_KEY;
 });
 
-test('POST /api/ai-analyze errors without API key', async () => {
-  delete process.env.AI_API_KEY;
-  const { server, url } = await startServer();
-  const res = await fetch(`${url}/api/ai-analyze`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ text: 'hi' }),
+  test('POST /api/ai-analyze errors without API key', async () => {
+    delete process.env.AI_API_KEY;
+    const { server, url } = await startServer();
+    const res = await fetch(`${url}/api/ai-analyze`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: 'hi' }),
+    });
+    assert.strictEqual(res.status, 503);
+    const data = await res.json();
+    assert.strictEqual(data.error, 'Missing AI_API_KEY');
+    server.close();
   });
-  assert.strictEqual(res.status, 500);
-  const data = await res.json();
-  assert.strictEqual(data.error, 'Missing AI_API_KEY');
-  server.close();
-});
 
 test('POST /api/ai-analyze returns timeout error when OpenAI unresponsive', async () => {
   process.env.AI_API_KEY = 'test-key';
