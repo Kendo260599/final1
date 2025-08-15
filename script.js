@@ -280,21 +280,39 @@ async function renderResult(R,i){
   html+=`<hr/><h3 class="block-title">Phân tích AI</h3><div id="ai-analysis"><em>Đang phân tích…</em></div>`;
   if(resEl) resEl.innerHTML=html;
   try {
-    const ai = await getAiAnalysis({input:i, result:R});
+    const ai = await getAiAnalysis({ input: i, result: R });
     document.getElementById('ai-analysis').textContent = ai.text || 'Không có phản hồi';
-  } catch(err) {
-    document.getElementById('ai-analysis').textContent = 'Lỗi AI: ' + (err.message || err);
+  } catch (err) {
+    let msg;
+    if (err.message === 'Missing AI_API_KEY') {
+      msg = 'Thiếu AI_API_KEY. Hãy thiết lập biến AI_API_KEY và khởi động lại server.';
+    } else if (err.message === 'Network error') {
+      msg = 'Không thể kết nối máy chủ. Hãy đảm bảo server đang chạy.';
+    } else {
+      msg = 'Lỗi AI: ' + (err.message || err);
+    }
+    document.getElementById('ai-analysis').textContent = msg;
   }
 }
 
-async function getAiAnalysis(payload){
-  const res = await fetch('./api/ai-analyze', {
-    method: 'POST',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({ text: JSON.stringify(payload) })
-  });
-  if(!res.ok) throw new Error('Network error');
-  return res.json();
+async function getAiAnalysis(payload) {
+  try {
+    const res = await fetch('./api/ai-analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: JSON.stringify(payload) }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      throw new Error(data.error || 'Network error');
+    }
+    return data;
+  } catch (err) {
+    if (err.name === 'TypeError') {
+      throw new Error('Network error');
+    }
+    throw err;
+  }
 }
 
 /* ====== Vẽ đa giác nền nhà ====== */
