@@ -59,7 +59,7 @@ ul.clean li:last-child{border-bottom:none}
 .muted{color:var(--muted)}
 
 .table-wrap{overflow:auto}
-.data-table{width:100%;border-collapse:collapse}
+.data-table{width:100%;max-width:100%;border-collapse:collapse}
 .data-table th,.data-table td{border-bottom:1px solid #edf1f7;padding:10px;text-align:left;white-space:nowrap}
 .data-table tbody tr:hover{background:#fafcff}
 .row-actions{display:flex;gap:8px}
