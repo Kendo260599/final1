@@ -47,7 +47,13 @@ Nếu không dùng polyfill này, hãy đảm bảo môi trường Node.js >= 18
    cp .env.example .env
    ```
 
-   Biến `AI_API_KEY` dùng để xác thực với dịch vụ AI cho các tính năng liên quan. Việc sử dụng khóa này có thể chịu giới hạn hoặc phát sinh chi phí tùy theo nhà cung cấp.
+   Sau đó chỉnh sửa file `.env` và bổ sung dòng:
+
+   ```bash
+   AI_API_KEY="<khóa_AI_của_bạn>"
+   ```
+
+   Biến `AI_API_KEY` dùng để xác thực với dịch vụ AI cho các tính năng liên quan. Nếu không thiết lập biến này, các API liên quan sẽ trả về mã lỗi `503`.
 
 2. (Tuỳ chọn) Chỉ định đường dẫn database bằng biến môi trường `BIRTH_DB` (mặc định `birth_info.db`):
 
