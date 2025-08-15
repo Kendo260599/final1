@@ -2,7 +2,7 @@
 import parseDateParts from "./parseDateParts.mjs";
 import { ISSUES, detectIssues } from './siteIssues.mjs';
 import { computeCanChiAndStars } from './advancedHoroscope.mjs';
-import { getWardsForProvince, loadWardsFromUrl } from './wards.mjs';
+import WARDS, { getWardsForProvince } from './wards.mjs';
 import getAuspiciousDays from './getAuspiciousDays.mjs';
 import lunar from './lunar.js';
 import {
@@ -100,6 +100,27 @@ function composeFullAddress(){
   const detail=document.getElementById('bd-address-detail').value.trim();
   const parts=[]; if(detail)parts.push(detail); if(ward)parts.push(ward); if(huyen)parts.push(huyen); parts.push(prov);
   return parts.join(', ');
+}
+
+async function populateWardSelect(){
+  try{
+    const res=await fetch('./data/wards.json',{cache:'no-store'});
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const data=await res.json();
+    if(Array.isArray(data)){
+      const map={};
+      data.forEach(w=>{
+        const p=w.province||'Đồng Nai';
+        (map[p]=map[p]||[]).push(w.name);
+      });
+      Object.assign(WARDS,map);
+    }else{
+      Object.assign(WARDS,data);
+    }
+  }catch(err){
+    console.error('Failed to load wards',err);
+  }
+  populateWardsForProvince();
 }
 
 function checkSiteIssues(input){
@@ -203,8 +224,17 @@ function gatherInputs(){
   return {name,phone,birth,gender,huong,yearX,monthX,bds,layout,issueIds:selectedIssueIds.slice()};
 }
 
+function validateInputs(i){
+  if(!i.birth) return 'Vui lòng nhập ngày sinh.';
+  if(!i.yearX||i.yearX<1900||i.yearX>2099) return 'Năm xây không hợp lệ.';
+  if(!i.monthX||i.monthX<1||i.monthX>12) return 'Tháng xây không hợp lệ.';
+  return '';
+}
+
 
 async function renderResult(R,i){
+  const resEl=document.getElementById('result-content');
+  if(resEl) resEl.innerHTML='';
   const dir=analyzeHouseDirection(R.cung.cung,i.huong);
   const site=checkSiteIssues(i.layout || i.issueIds || []);
   const num=calculateNumerology(i.birth);
@@ -244,7 +274,7 @@ async function renderResult(R,i){
   html+=`<p><strong>Giá:</strong> ${i.bds.price?new Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND'}).format(i.bds.price):'—'}</p>`;
   html+=`<p><strong>Ghi chú:</strong> ${i.bds.note||'—'}</p>`;
   html+=`<hr/><h3 class="block-title">Phân tích AI</h3><div id="ai-analysis"><em>Đang phân tích…</em></div>`;
-  document.getElementById('result-content').innerHTML=html;
+  if(resEl) resEl.innerHTML=html;
   try {
     const ai = await getAiAnalysis({input:i, result:R});
     document.getElementById('ai-analysis').textContent = ai.text || 'Không có phản hồi';
@@ -389,12 +419,8 @@ function redrawCanvas(){
 /* ====== Sự kiện UI ====== */
 document.addEventListener('DOMContentLoaded', async ()=>{
     initCanvasDrawing();
-  // Province -> Wards
   document.getElementById('bd-province').addEventListener('change',populateWardsForProvince);
-  populateWardsForProvince();
-  // Nạp thêm dữ liệu phường và cập nhật lại danh sách
-  await loadWardsFromUrl('./data/wards.json').catch(()=>{});
-  populateWardsForProvince();
+  await populateWardSelect();
 
     const birthEl=document.getElementById('ngay-sinh');
   const calEl=document.getElementById('calendar-type');
@@ -546,15 +572,16 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   }
 
   // Analyze
-  const btnAnalyze=document.getElementById('btn-analyze');
+  const btnAnalyze=document.getElementById('analyzeBtn');
   if(btnAnalyze){
     btnAnalyze.addEventListener('click',async()=>{
+      const i=gatherInputs();
+      const err=validateInputs(i);
+      const resultEl=document.getElementById('result-content');
+      if(resultEl) resultEl.innerHTML='';
+      if(err){ alert(err); return; }
       try{
-        const i=gatherInputs();
-        if(!i.birth) return alert('Vui lòng nhập ngày sinh.');
-        if(!i.yearX||i.yearX<1900||i.yearX>2099) return alert('Năm xây không hợp lệ.');
-        if(!i.monthX||i.monthX<1||i.monthX>12) return alert('Tháng xây không hợp lệ.');
-        const R=evaluateBuildTime(i.birth,i.gender,i.yearX,i.monthX);
+         const R=evaluateBuildTime(i.birth,i.gender,i.yearX,i.monthX);
         await renderResult(R,i);
         const days=getAuspiciousDays(i.birth,i.yearX,i.monthX);
         const el=document.getElementById('auspicious-days');
