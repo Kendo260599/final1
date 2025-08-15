@@ -549,22 +549,24 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   }
 
   // Analyze
-  document.getElementById('btn-analyze').addEventListener('click',async()=>{
-    try{
-      const i=gatherInputs();
-      if(!i.birth) return alert('Vui lòng nhập ngày sinh.');
-      if(!i.yearX||i.yearX<1900||i.yearX>2099) return alert('Năm xây không hợp lệ.');
-      if(!i.monthX||i.monthX<1||i.monthX>12) return alert('Tháng xây không hợp lệ.');
-      const R=evaluateBuildTime(i.birth,i.gender,i.yearX,i.monthX);
-      await renderResult(R,i);
-      const days=getAuspiciousDays(i.birth,i.yearX,i.monthX);
-      const el=document.getElementById('auspicious-days');
-      if(el) el.innerHTML = days.length?`<strong>Ngày đẹp:</strong> ${days.join(', ')}`:'Không có ngày phù hợp.';
-      const inp=document.getElementById('ad-month');
-      if(inp) inp.value=`${i.yearX}-${String(i.monthX).padStart(2,'0')}`;
-    }catch(err){ alert('Lỗi: '+(err.message||err)); }
-  });
-
+  const btnAnalyze=document.getElementById('btn-analyze');
+  if(btnAnalyze){
+    btnAnalyze.addEventListener('click',async()=>{
+      try{
+        const i=gatherInputs();
+        if(!i.birth) return alert('Vui lòng nhập ngày sinh.');
+        if(!i.yearX||i.yearX<1900||i.yearX>2099) return alert('Năm xây không hợp lệ.');
+        if(!i.monthX||i.monthX<1||i.monthX>12) return alert('Tháng xây không hợp lệ.');
+        const R=evaluateBuildTime(i.birth,i.gender,i.yearX,i.monthX);
+        await renderResult(R,i);
+        const days=getAuspiciousDays(i.birth,i.yearX,i.monthX);
+        const el=document.getElementById('auspicious-days');
+        if(el) el.innerHTML = days.length?`<strong>Ngày đẹp:</strong> ${days.join(', ')}`:'Không có ngày phù hợp.';
+        const inp=document.getElementById('ad-month');
+        if(inp) inp.value=`${i.yearX}-${String(i.monthX).padStart(2,'0')}`;
+      }catch(err){ alert('Lỗi: '+(err.message||err)); }
+    });
+  }
   const btnGood=document.getElementById('btn-auspicious');
   if(btnGood){
     btnGood.addEventListener('click',()=>{
