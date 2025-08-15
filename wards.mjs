@@ -30,7 +30,7 @@ export const WARDS = {
  */
 export async function loadWardsFromUrl(url = './data/wards.json') {
   try {
- const res = await fetch(`${window.location.origin}${window.location.pathname}data/wards.json`);
+const res = await fetch(`${window.location.origin}/final1/data/wards.json`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     Object.assign(WARDS, data);
