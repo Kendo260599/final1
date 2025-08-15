@@ -140,8 +140,6 @@ function checkSiteIssues(input){
   return result;
 }
 
-
-
 function ensureSolarBirth(birth){
   if(!birth) return birth;
   const calType=document.getElementById('calendar-type')?.value||'solar';
@@ -596,9 +594,14 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   }
 
   // Analyze
-  const btnAnalyze=document.getElementById('analyzeBtn');
-  if(btnAnalyze){
-    btnAnalyze.addEventListener('click',async()=>{
+const btnAnalyze = document.getElementById('analyzeBtn');
+if (!btnAnalyze) {
+  console.error('Không tìm thấy nút phân tích phong thủy với ID analyzeBtn');
+} else {
+  btnAnalyze.addEventListener('click', async () => {
+    await analyzeFengShui();
+  });
+}
       const i=gatherInputs();
       const err=validateInputs(i);
       const resultEl=document.getElementById('result-content');
