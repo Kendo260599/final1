@@ -174,7 +174,7 @@ export function solarToLunar(dateObj) {
   const y = dateObj.year !== undefined ? dateObj.year : dateObj.getFullYear();
   const res = convertSolar2Lunar(d, m, y, 7);
   return { day: res.lunarDay, month: res.lunarMonth, year: res.lunarYear, leap: res.lunarLeap };
-}␊
+}
 ␊
 export function lunarToSolar(dateObj) {
   const d = dateObj.day;
@@ -186,6 +186,7 @@ export function lunarToSolar(dateObj) {
 }
 
 export default { solarToLunar, lunarToSolar };
+
 
 
 
