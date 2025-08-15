@@ -66,7 +66,7 @@ ul.clean li:last-child{border-bottom:none}
 .row-actions .delete{background:#ffecec;color:#d93025}
 
 /* Issues */
-.issues-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px 16px;max-height:320px;overflow:auto;border:1px dashed #e1e7f0;border-radius:8px;padding:10px}
+.issues-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px 16px;max-height:320px;overflow-y:auto;border:1px dashed #e1e7f0;border-radius:8px;padding:10px}
 @media (max-width:720px){.issues-grid{grid-template-columns:1fr}}
 .issue-item{display:flex;gap:8px;align-items:flex-start}
 
