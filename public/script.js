@@ -355,11 +355,17 @@ async function getAiAnalysis(payload){
   return res.json();
 }
 
-function saveProfile(currentResult){
-  const i=gatherInputs();
-  if(!i.name) return alert('Vui lòng nhập họ tên.');
-  if(!i.phone) return alert('Vui lòng nhập SĐT.');
-  if(!isValidPhone(i.phone)) return alert('SĐT chưa đúng định dạng.');
+function saveProfile(
+  gatherInputsFn = gatherInputs,
+  currentResult = null,
+  evaluateBuildTimeFn = evaluateBuildTime,
+  calculateNumerologyFn = calculateNumerology,
+  detectIssuesFn = detectIssues
+){
+  const i=gatherInputsFn();
+  const R=currentResult||evaluateBuildTimeFn(i.birth,i.gender,i.yearX,i.monthX);
+  const numerology=calculateNumerologyFn(i.birth);
+  const site=i.layout?detectIssuesFn(i.layout):{ids:i.issueIds||[]};
   if(!i.birth) return alert('Vui lòng nhập ngày sinh.');
   if(!i.yearX||i.yearX<1900||i.yearX>2099) return alert('Năm xây không hợp lệ.');
   if(!i.monthX||i.monthX<1||i.monthX>12) return alert('Tháng xây không hợp lệ.');
