@@ -112,11 +112,6 @@ function checkSiteIssues(input){
   }else{
     result=detectIssues(input||{});
   }
-  const wrap=document.getElementById('issues-container');
-  if(wrap){
-    if(result.ids.length===0) wrap.innerHTML='<p class="good">Không phát hiện lỗi.</p>';
-    else wrap.innerHTML=result.ids.map(id=>{ const it=ISSUES.find(i=>i.id===id); return `<div class="issue-item"><strong>[${it.cat}]</strong> ${it.label}</div>`; }).join('');
-  }
   return result;
 }
 
@@ -398,7 +393,7 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   document.getElementById('bd-province').addEventListener('change',populateWardsForProvince);
   populateWardsForProvince();
   // Nạp thêm dữ liệu phường và cập nhật lại danh sách
-  await loadWardsFromUrl().catch(()=>{});
+  await loadWardsFromUrl('./data/wards.json').catch(()=>{});
   populateWardsForProvince();
 
     const birthEl=document.getElementById('ngay-sinh');
@@ -430,6 +425,8 @@ document.addEventListener('DOMContentLoaded', async ()=>{
 
   const issuesWrap=document.getElementById('issues-container');
   if(issuesWrap){
+    issuesWrap.innerHTML='';
+    selectedIssueIds=[];
     try{
       ISSUES.forEach(it=>{
         const label=document.createElement('label');
