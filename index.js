@@ -2,6 +2,8 @@ const express = require("express");
 require("dotenv").config();
 const { spawn } = require("child_process");
 const path = require("path");
+const fetch = (...args) =>
+  import("node-fetch").then(({ default: f }) => f(...args));
 
 // helper fetchWithTimeout using AbortController
 async function fetchWithTimeout(url, options = {}, ms) {
@@ -179,6 +181,7 @@ if (require.main === module) {
 }
 
 module.exports = app;
+
 
 
 
