@@ -38,6 +38,8 @@ Alternatively, running any script that instantiates `BirthInfoRepository`
 will apply the migration automatically.
 
 ## Khởi động server
+Ứng dụng dùng polyfill `node-fetch` để cung cấp hàm `fetch` trên Node.js < 18.
+Nếu không dùng polyfill này, hãy đảm bảo môi trường Node.js >= 18.
 
 1. Sao chép file cấu hình mẫu và điền khóa API:
 
