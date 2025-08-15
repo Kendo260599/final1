@@ -197,7 +197,7 @@
         <canvas id="fengCanvas" width="400" height="400" style="border:1px solid #ccc;margin-top:8px;"></canvas>
 
         <div class="actions" style="margin-top:14px;">
-          <button id="btn-analyze" type="button">Phân tích phong thủy</button>
+           <button id="analyzeBtn" type="button">Phân tích phong thủy</button>
           <button id="btn-save" class="secondary">Lưu hồ sơ</button>
           <button id="btn-export" class="secondary">Xuất CSV</button>
         </div>
@@ -269,8 +269,5 @@
   <script type="module" src="./public/horoscope.js" defer></script>
   <script type="module" src="./public/profiles.js" defer></script>
   <script type="module" src="./script.js" defer></script>
-    import('./script.js')
-      .catch(err => console.error('Failed to load script.js', err));
-  </script>
 </body>
 </html>
