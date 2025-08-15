@@ -72,3 +72,9 @@ will apply the migration automatically.
    ```bash
    npm test
    ```
+
+## Lưu ý phát triển giao diện
+
+- Khi chỉnh sửa giao diện trong `index.html`, hãy giữ lại phần tử `<div id="issues-container">`.
+- Các script phía client phụ thuộc vào phần tử này để hiển thị danh sách lỗi phong thủy.
+- Nếu phần tử bị xoá, ứng dụng vẫn nạp `script.js` nhưng sẽ ghi cảnh báo trong console.
