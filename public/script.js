@@ -1,10 +1,10 @@
 /* ====== Danh sách Phường/Xã mới (95 đơn vị) tách theo Tỉnh ====== */
-import parseDateParts from "./parseDateParts.mjs";
-import { ISSUES, detectIssues } from './siteIssues.mjs';
-import { computeCanChiAndStars } from './advancedHoroscope.mjs';
-import { getWardsForProvince, loadWardsFromUrl } from './wards.mjs';
-import getAuspiciousDays from './getAuspiciousDays.mjs';
-import lunar from './lunar.js';
+import parseDateParts from "../parseDateParts.mjs";
+import { ISSUES, detectIssues } from '../siteIssues.mjs';
+import { computeCanChiAndStars } from '../advancedHoroscope.mjs';
+import { getWardsForProvince, loadWardsFromUrl } from '../wards.mjs';
+import getAuspiciousDays from '../getAuspiciousDays.mjs';
+import lunar from '../lunar.js';
 import {
   getEffectiveBirthYear,
   tuoiMu,
@@ -12,8 +12,8 @@ import {
   checkHoangOc,
   checkTamTai,
   checkXungTuoi,
-} from './fortune.mjs';
-import { elemYear, elemConflict } from './elements.js';
+} from '../fortune.mjs';
+import { elemYear, elemConflict } from '../elements.js';
 const { solarToLunar, lunarToSolar } = lunar;
 
 /* ====== La bàn số ====== */
