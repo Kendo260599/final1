@@ -4,7 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Phong Thủy Lê Gia</title>
- <link rel="stylesheet" href="style.css"/>
+  <base href="/final1/" />
+ <link rel="stylesheet" href="./style.css"/>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Noto+Sans+SC:wght@400;700&display=swap" rel="stylesheet">
@@ -196,7 +197,7 @@
         <canvas id="fengCanvas" width="400" height="400" style="border:1px solid #ccc;margin-top:8px;"></canvas>
 
         <div class="actions" style="margin-top:14px;">
-          <button id="btn-analyze">Phân tích phong thủy</button>
+          <button id="btn-analyze" type="button">Phân tích phong thủy</button>
           <button id="btn-save" class="secondary">Lưu hồ sơ</button>
           <button id="btn-export" class="secondary">Xuất CSV</button>
         </div>
@@ -264,10 +265,10 @@
     </footer>
   </div>
 
-  <script type="module" src="public/compass.js"></script>
-  <script type="module" src="public/horoscope.js"></script>
-  <script type="module" src="public/profiles.js"></script>
-  <script type="module">
+  <script type="module" src="./public/compass.js" defer></script>
+  <script type="module" src="./public/horoscope.js" defer></script>
+  <script type="module" src="./public/profiles.js" defer></script>
+  <script type="module" src="./script.js" defer></script>
     import('./script.js')
       .catch(err => console.error('Failed to load script.js', err));
   </script>
