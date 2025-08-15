@@ -2,8 +2,9 @@ const express = require("express");
 require("dotenv").config();
 const { spawn } = require("child_process");
 const path = require("path");
-const fetch = (...args) =>
-  import("node-fetch").then(({ default: f }) => f(...args));
+const fetch =
+  global.fetch ||
+  ((...args) => import("node-fetch").then(({ default: f }) => f(...args)));
 
 // helper fetchWithTimeout using AbortController
 async function fetchWithTimeout(url, options = {}, ms) {
@@ -54,7 +55,10 @@ app.post("/api/ai-analyze", async (req, res) => {
   try {
     const apiKey = process.env.AI_API_KEY;
     if (!apiKey) {
-      return res.status(500).json({ error: "Missing AI_API_KEY" });
+      return res.status(503).json({
+        error: "Missing AI_API_KEY",
+        message: "Set AI_API_KEY in the server environment or .env file",
+      });
     }
 
     if (
@@ -181,6 +185,7 @@ if (require.main === module) {
 }
 
 module.exports = app;
+
 
 
 
