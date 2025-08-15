@@ -282,7 +282,7 @@ async function calculateHoroscope(birth, gender){
     cuc:`${element} cục`
   };
   try{
-    const res=await fetch(`/api/horoscope?birth=${encodeURIComponent(birth)}&gender=${encodeURIComponent(gender)}`);
+    const res=await fetch(`./api/horoscope?birth=${encodeURIComponent(birth)}&gender=${encodeURIComponent(gender)}`);
     if(res.ok){
       const data=await res.json();
       Object.assign(result,data);
@@ -292,7 +292,7 @@ async function calculateHoroscope(birth, gender){
 }
 
 async function fetchChart(name){
-  const res=await fetch(`/api/chart?name=${encodeURIComponent(name)}`);
+  const res=await fetch(`./api/chart?name=${encodeURIComponent(name)}`);
   return await res.json();
 }
 
@@ -346,7 +346,7 @@ async function renderResult(R,i){
 }
 
 async function getAiAnalysis(payload){
-  const res = await fetch('/api/ai-analyze', {
+  const res = await fetch('./api/ai-analyze', {
     method: 'POST',
     headers: {'Content-Type':'application/json'},
     body: JSON.stringify(payload)
