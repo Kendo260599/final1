@@ -594,7 +594,7 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   }
 
   // Analyze
-const btnAnalyze = document.getElementById('analyzeBtn');
+const btnAnalyze = document.getElementById('btn-analyze');
 if (!btnAnalyze) {
   console.error('Không tìm thấy nút phân tích phong thủy với ID analyzeBtn');
 } else {
