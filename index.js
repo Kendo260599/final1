@@ -21,6 +21,7 @@ const app = express();
 app.use(express.json());
 
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(__dirname));
 
 app.get("/api/chart", (req, res) => {
   const { name } = req.query;
@@ -181,6 +182,7 @@ if (require.main === module) {
 }
 
 module.exports = app;
+
 
 
 
