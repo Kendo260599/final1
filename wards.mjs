@@ -28,7 +28,7 @@ export const WARDS = {
  * Nạp thêm dữ liệu phường/xã từ một URL JSON và gộp vào WARDS.
  * Nếu tải thất bại sẽ giữ nguyên dữ liệu cục bộ.
  */
-export async function loadWardsFromUrl(url = 'wards.json') {
+export async function loadWardsFromUrl(url = './data/wards.json') {
   try {
     const res = await fetch(url);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
