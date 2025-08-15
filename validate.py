@@ -74,4 +74,5 @@ def validate(
         datetime_utc=dt_utc,
         latitude=0.0,
         longitude=0.0,
+        birth_time=dt_local,
     )
