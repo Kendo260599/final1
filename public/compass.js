@@ -38,12 +38,12 @@ export async function startCompass(){
       else if(typeof e.alpha==='number'){ heading=360 - e.alpha; }
       if(heading!=null) updateCompassUI(heading);
     };
-    window.addEventListener('deviceorientation',orientationHandler,{passive:true});
+    window.addEventListener('deviceorientation', orientationHandler, {passive:true});
     status.textContent='Đang đo… giữ máy song song mặt đất & lắc hình số 8 để hiệu chuẩn.';
   }catch(err){ status.textContent='Lỗi la bàn: '+(err.message||err); }
 }
 export function stopCompass(){
-  if(orientationHandler){ window.removeEventListener('deviceorientation',orientationHandler,{passive:true}); orientationHandler=null; }
+  if(orientationHandler){ window.removeEventListener('deviceorientation', orientationHandler, {passive:true}); orientationHandler=null; }
   document.getElementById('compass-status').textContent='Đã dừng.';
 }
 export function applyCompassToDirection(){
