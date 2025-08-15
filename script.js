@@ -43,7 +43,9 @@ function calculateNumerology(birth){
   return {number:total,meaning:meanings[total]||''};
 }
 const MALE_START=1921, FEMALE_START=1922;
-const MALE_SEQ=['Đoài','Càn','Khôn','Tốn','Chấn','Khôn','Khảm','Ly','Cấn']; const FEMALE_SEQ=['Cấn','Khảm','Ly','Tốn','Chấn','Khôn','Càn','Đoài','Cấn']; const mod9=n=>((n%9)+9)%9;
+const MALE_SEQ=['Đoài','Càn','Khôn','Tốn','Chấn','Khôn','Khảm','Ly','Cấn'];
+const FEMALE_SEQ=['Ly','Khảm','Khôn','Chấn','Tốn','Cấn','Càn','Đoài','Cấn'];
+const mod9=n=>((n%9)+9)%9;
 function getCungMenh(birth,gender){
   const eff=getEffectiveBirthYear(birth);
   const idx=mod9(eff-(gender==='nam'?MALE_START:FEMALE_START));
