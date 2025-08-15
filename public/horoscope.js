@@ -14,7 +14,7 @@ export async function calculateHoroscope(birth, gender){
     cuc:`${element} cục`
   };
   try{
-    const res=await fetch(`/api/horoscope?birth=${encodeURIComponent(birth)}&gender=${encodeURIComponent(gender)}`);
+    const res=await fetch(`./api/horoscope?birth=${encodeURIComponent(birth)}&gender=${encodeURIComponent(gender)}`);
     if(res.ok){
       const data=await res.json();
       Object.assign(result,data);
@@ -24,6 +24,6 @@ export async function calculateHoroscope(birth, gender){
 }
 
 export async function fetchChart(name){
-  const res=await fetch(`/api/chart?name=${encodeURIComponent(name)}`);
+  const res=await fetch(`./api/chart?name=${encodeURIComponent(name)}`);
   return await res.json();
 }
