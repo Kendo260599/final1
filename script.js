@@ -291,7 +291,7 @@ async function getAiAnalysis(payload){
   const res = await fetch('./api/ai-analyze', {
     method: 'POST',
     headers: {'Content-Type':'application/json'},
-    body: JSON.stringify(payload)
+    body: JSON.stringify({ text: JSON.stringify(payload) })
   });
   if(!res.ok) throw new Error('Network error');
   return res.json();
