@@ -115,10 +115,12 @@ async function populateWardSelect(){
       });
       Object.assign(WARDS,map);
     }else{
-      Object.assign(WARDS,data);
-    }
+    Object.assign(WARDS,data);
+  }
   }catch(err){
     console.error('Failed to load wards',err);
+    const sel=document.getElementById('bd-ward');
+    if(sel) sel.innerHTML='<option value="">Không tải được dữ liệu</option>';
   }
   populateWardsForProvince();
 }
@@ -284,7 +286,7 @@ async function renderResult(R,i){
 }
 
 async function getAiAnalysis(payload){
-  const res = await fetch('/api/ai-analyze', {
+  const res = await fetch('./api/ai-analyze', {
     method: 'POST',
     headers: {'Content-Type':'application/json'},
     body: JSON.stringify(payload)
@@ -418,7 +420,9 @@ function redrawCanvas(){
 
 /* ====== Sự kiện UI ====== */
 document.addEventListener('DOMContentLoaded', async ()=>{
-    initCanvasDrawing();
+  const root=document.querySelector('.page-enter');
+  if(root) root.classList.remove('page-enter');
+  initCanvasDrawing();
   document.getElementById('bd-province').addEventListener('change',populateWardsForProvince);
   await populateWardSelect();
 
@@ -656,9 +660,4 @@ document.getElementById('profiles-tbody').addEventListener('click',e=>{
       if(confirm('Xóa hồ sơ này?')){ setProfiles(list.filter(x=>x.id!==id)); renderProfiles(document.getElementById('profiles-search').value); }
     }
   });
-});
-
-document.addEventListener('DOMContentLoaded',()=>{
-  const root=document.querySelector('.page-enter');
-  if(root) root.classList.remove('page-enter');
 });
