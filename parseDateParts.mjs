@@ -1,6 +1,24 @@
 export default function parseDateParts(s) {
   if (!s || typeof s !== 'string') throw new Error('Ngày sinh không hợp lệ');
   s = s.trim().replace(/\s+/g,'');
+  // Compact numeric forms (no separators):
+  // 6 digits: d m yyyy  (e.g. 111990 -> 1/1/1990)
+  // 8 digits: dd mm yyyy (e.g. 25121990 -> 25/12/1990)
+  if(/^[0-9]+$/.test(s)) {
+    if(s.length === 6) {
+      const day = parseInt(s[0],10);
+      const month = parseInt(s[1],10);
+      const year = parseInt(s.slice(2),10);
+      return { year, month, day };
+    }
+    if(s.length === 8) {
+      const day = parseInt(s.slice(0,2),10);
+      const month = parseInt(s.slice(2,4),10);
+      const year = parseInt(s.slice(4),10);
+      return { year, month, day };
+    }
+    throw new Error('Định dạng ngày nén không hỗ trợ');
+  }
   // Accepted separators: - or /
   const sep = s.includes('-') ? '-' : s.includes('/') ? '/' : null;
   if(!sep) throw new Error('Định dạng ngày phải có "-" hoặc "/"');

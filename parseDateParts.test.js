@@ -42,3 +42,19 @@ test('parseDateParts handles YYYY/M/D (slash ISO)', () => {
     day: 9,
   });
 });
+
+test('parseDateParts handles compact 6-digit d m yyyy (111990)', () => {
+  assert.deepStrictEqual(parseDateParts('111990'), {
+    year: 1990,
+    month: 1,
+    day: 1,
+  });
+});
+
+test('parseDateParts handles compact 8-digit dd mm yyyy (25121990)', () => {
+  assert.deepStrictEqual(parseDateParts('25121990'), {
+    year: 1990,
+    month: 12,
+    day: 25,
+  });
+});
