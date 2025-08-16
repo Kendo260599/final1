@@ -75,14 +75,24 @@ app.get("/api/auspicious-days", async (req, res) => {
           normBirth = `${c}-${b}-${a}`;
         }
       }
-      const { year: by, month: bm, day: bd } = parseDateParts(normBirth);
+      let parsed;
+      const dbg = process.env.DEBUG_BIRTH === '1';
+      try {
+        parsed = parseDateParts(normBirth);
+      } catch (e) {
+        if (dbg) console.log('[DEBUG_BIRTH] parse error', { input: birth, normalized: normBirth, error: e.message });
+        return res.status(400).json({ error: "Invalid birth", detail: e.message });
+      }
+      const { year: by, month: bm, day: bd } = parsed;
       if (bm < 1 || bm > 12 || bd < 1 || bd > 31) {
-        return res.status(400).json({ error: "Invalid birth" });
+        if (dbg) console.log('[DEBUG_BIRTH] range fail', { parsed });
+        return res.status(400).json({ error: "Invalid birth", detail: 'Out of range' });
       }
-      // Basic future check (optional): birth year should not exceed target year + 1
       if (by > y + 1) {
-        return res.status(400).json({ error: "Invalid birth" });
+        if (dbg) console.log('[DEBUG_BIRTH] future year fail', { parsed, targetYear: y });
+        return res.status(400).json({ error: "Invalid birth", detail: 'Birth year too large' });
       }
+      if (process.env.DEBUG_BIRTH === '1') console.log('[DEBUG_BIRTH] ok', { input: birth, normalized: normBirth, parsed });
     } catch (e) {
       return res.status(400).json({ error: "Invalid birth" });
     }
