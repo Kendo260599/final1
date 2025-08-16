@@ -275,24 +275,12 @@ async function renderResult(R,i){
   html+=`<p><strong>Tờ/Thửa:</strong> ${i.bds.to||'—'} / ${i.bds.thua||'—'}</p>`;
   html+=`<p><strong>Giá:</strong> ${i.bds.price?new Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND'}).format(i.bds.price):'—'}</p>`;
   html+=`<p><strong>Ghi chú:</strong> ${i.bds.note||'—'}</p>`;
-  // AI section removed; previously displayed disabled notice
+  // (AI section removed)
   if(resEl) resEl.innerHTML=html;
-  // AI analysis temporarily disabled to prevent server crashes
-  // try {
-  //   const ai = await getAiAnalysis({ input: i, result: R });
-  //   document.getElementById('ai-analysis').textContent = ai.text || 'Không có phản hồi';
-  // } catch (err) {
-  //   let msg;
-  //   if (err.message === 'Network error') {
-  //     msg = 'Không thể kết nối máy chủ. Hãy đảm bảo server đang chạy.';
-  //   } else {
-  //     msg = 'Lỗi AI: ' + (err.message || err);
-  //   }
-  //   document.getElementById('ai-analysis').textContent = msg;
-  // }
+  // (AI analysis removed)
 }
 
-// getAiAnalysis removed (AI disabled)
+// (getAiAnalysis removed)
 
 /* ====== Vẽ đa giác nền nhà ====== */
 const polygonPoints=[];

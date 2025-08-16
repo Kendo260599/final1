@@ -10,7 +10,7 @@ async function startServer() {
   return { server, url: `http://127.0.0.1:${port}` };
 }
 
-// Former /api/horoscope endpoint removed (was AI-based)
+// /api/horoscope (AI feature) removed
 
 test('GET /api/auspicious-days returns day list', async () => {
   const { server, url } = await startServer();
@@ -23,4 +23,4 @@ test('GET /api/auspicious-days returns day list', async () => {
   server.close();
 });
 
-// Former /api/ai-analyze endpoint removed (AI fully excised)
+// /api/ai-analyze removed

@@ -102,7 +102,7 @@ async function runAllTests() {
         'Auspicious Days API'
     );
     
-    // /api/horoscope removed (AI functions excised)
+    // /api/horoscope removed
     
     await testEndpoint(
         `${baseUrl}/api/chart?name=TestUser`,

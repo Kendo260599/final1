@@ -41,7 +41,7 @@ will apply the migration automatically.
 Ứng dụng dùng polyfill `node-fetch` để cung cấp hàm `fetch` trên Node.js < 18.
 Nếu không dùng polyfill này, hãy đảm bảo môi trường Node.js >= 18.
 
-1. (Tuỳ chọn) Tạo file `.env` nếu cần các biến môi trường khác. (AI đã bị gỡ bỏ hoàn toàn; không còn biến AI_API_KEY.)
+1. (Tuỳ chọn) Tạo file `.env` nếu cần các biến môi trường khác. (Các tính năng AI đã bị gỡ bỏ; không cần AI_API_KEY.)
 
 2. (Tuỳ chọn) Chỉ định đường dẫn database bằng biến môi trường `BIRTH_DB` (mặc định `birth_info.db`):
 
