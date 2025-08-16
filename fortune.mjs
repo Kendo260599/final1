@@ -1,5 +1,5 @@
 import parseDateParts from "./parseDateParts.mjs";
-import zodiac from "./zodiac.js";
+import zodiac from "./zodiac.mjs";
 const { idxZ, nameZ, TTG, ZODIAC } = zodiac;
 
 function getEffectiveBirthYear(b) {

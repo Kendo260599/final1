@@ -2,7 +2,8 @@ import test from "node:test";
 import assert from "node:assert";
 
 import parseDateParts from "./parseDateParts.mjs";
-import { elemYear, elemConflict } from "./elements.js";
+import elements from "./elements.mjs";
+const { elemYear, elemConflict } = elements;
 import {
   getEffectiveBirthYear,
   tuoiMu,

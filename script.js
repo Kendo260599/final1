@@ -13,7 +13,7 @@ import {
   checkTamTai,
   checkXungTuoi,
 } from './fortune.mjs';
-import { elemYear, elemConflict } from './elements.js';
+import { elemYear, elemConflict } from './elements.mjs';
 import { startCompass, stopCompass, applyCompassToDirection } from "./public/compass.js";
 import { calculateHoroscope, fetchChart } from "./public/horoscope.js";
 import { getProfiles, setProfiles, saveProfile, renderProfiles, exportCSV } from "./public/profiles.js";

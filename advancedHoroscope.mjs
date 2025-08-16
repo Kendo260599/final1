@@ -1,5 +1,5 @@
 import lunar from './lunar.mjs';
-import zodiac from './zodiac.js';
+import parseDateParts from './parseDateParts.mjs';
 const { solarToLunar } = lunar;
 
 const CAN = ['Giáp','Ất','Bính','Đinh','Mậu','Kỷ','Canh','Tân','Nhâm','Quý'];
@@ -17,10 +17,10 @@ function jdFromDate(dd, mm, yy){
 function parseBirth(birth){
   if(!birth) throw new Error('birth required');
   const [datePart,timePart='00:00'] = birth.trim().split('T');
-  const [year,month,day] = datePart.split('-').map(v=>parseInt(v,10));
-  const [hour] = timePart.split(':').map(v=>parseInt(v,10));
-  if([year,month,day].some(isNaN)) throw new Error('invalid birth date');
-  return {year,month,day,hour:hour||0};
+  const { year, month, day } = parseDateParts(datePart);
+  const hourRaw = parseInt(timePart.split(':')[0],10);
+  const hour = Number.isFinite(hourRaw)?hourRaw:0;
+  return {year,month,day,hour};
 }
 
 export function computeCanChiAndStars(birth){

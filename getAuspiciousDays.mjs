@@ -6,8 +6,9 @@ import {
   checkTamTai,
   checkXungTuoi,
 } from "./fortune.mjs";
-import { elemYear, elemConflict } from "./elements.js";
-import { ZODIAC } from "./zodiac.js";
+import elements from "./elements.mjs";
+import { ZODIAC } from "./zodiac.mjs";
+const { elemYear, elemConflict } = elements;
 
 export default function getAuspiciousDays(birth, year, month) {
   const eff = getEffectiveBirthYear(birth);
