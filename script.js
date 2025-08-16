@@ -236,7 +236,7 @@ function validateInputs(i){
     const mdays = new Date(year, month, 0).getDate();
     if(day < 1 || day > mdays) return 'Ngày sinh không hợp lệ.';
   } catch(e){
-    return 'Ngày sinh không hợp lệ. Định dạng chấp nhận: YYYY-MM-DD hoặc DD-MM-YYYY.';
+  return 'Ngày sinh không hợp lệ. Định dạng: YYYY-MM-DD, DD-MM-YYYY, 111990, 25121990, hoặc dùng / .';
   }
   if(!i.yearX||i.yearX<1900||i.yearX>2099) return 'Năm xây không hợp lệ.';
   if(!i.monthX||i.monthX<1||i.monthX>12) return 'Tháng xây không hợp lệ.';

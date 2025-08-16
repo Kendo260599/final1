@@ -58,3 +58,19 @@ test('parseDateParts handles compact 8-digit dd mm yyyy (25121990)', () => {
     day: 25,
   });
 });
+
+test('parseDateParts handles 7-digit dd m yyyy (1121990 -> 11/2/1990)', () => {
+  assert.deepStrictEqual(parseDateParts('1121990'), {
+    year: 1990,
+    month: 2,
+    day: 11,
+  });
+});
+
+test('parseDateParts handles dotted format 25.12.1990', () => {
+  assert.deepStrictEqual(parseDateParts('25.12.1990'), {
+    year: 1990,
+    month: 12,
+    day: 25,
+  });
+});
