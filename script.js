@@ -228,6 +228,16 @@ function gatherInputs(){
 
 function validateInputs(i){
   if(!i.birth) return 'Vui lòng nhập ngày sinh.';
+  // Kiểm tra định dạng & giá trị ngày sinh
+  try {
+    const { year, month, day } = parseDateParts(i.birth);
+    if(year < 1900 || year > 2100) return 'Năm sinh không hợp lệ (1900-2100).';
+    if(month < 1 || month > 12) return 'Tháng sinh không hợp lệ.';
+    const mdays = new Date(year, month, 0).getDate();
+    if(day < 1 || day > mdays) return 'Ngày sinh không hợp lệ.';
+  } catch(e){
+    return 'Ngày sinh không hợp lệ. Định dạng chấp nhận: YYYY-MM-DD hoặc DD-MM-YYYY.';
+  }
   if(!i.yearX||i.yearX<1900||i.yearX>2099) return 'Năm xây không hợp lệ.';
   if(!i.monthX||i.monthX<1||i.monthX>12) return 'Tháng xây không hợp lệ.';
   return '';

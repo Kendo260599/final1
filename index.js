@@ -64,7 +64,18 @@ app.get("/api/auspicious-days", async (req, res) => {
     }
     // Validate birth format and logical ranges
     try {
-      const { year: by, month: bm, day: bd } = parseDateParts(String(birth));
+      // Chuẩn hoá ngày sinh cho cả 2 dạng YYYY-MM-DD và DD-MM-YYYY
+      let normBirth = String(birth).trim();
+      // Nếu dạng dd-mm-yyyy (phần đầu <=31 và phần cuối >= 1900) -> đổi lại yyyy-mm-dd để dễ đọc/ghi thống nhất
+      const parts = normBirth.split(/[-/]/).map(p=>p.trim());
+      if(parts.length===3){
+        const [a,b,c]=parts;
+        if(a.length===2 && c.length===4 && parseInt(a,10)<=31){
+          // dd-mm-yyyy -> yyyy-mm-dd
+          normBirth = `${c}-${b}-${a}`;
+        }
+      }
+      const { year: by, month: bm, day: bd } = parseDateParts(normBirth);
       if (bm < 1 || bm > 12 || bd < 1 || bd > 31) {
         return res.status(400).json({ error: "Invalid birth" });
       }
