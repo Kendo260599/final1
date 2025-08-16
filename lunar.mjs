@@ -5,26 +5,23 @@
 function jdToDate(jd) {
   let a, b, c, d, e, m, day, month, year;
   a = jd + 32044;
-  b = (4 * a + 3) / 146097;
-  b = a - (146097 * b) / 4;
-  c = (4 * b + 3) / 1461;
-  d = b - (1461 * c) / 4;
-  e = (5 * d + 2) / 153;
-  day = d - (153 * e + 2) / 5 + 1;
-  month = e + 3 - 12 * (e / 10);
-  year = 100 * b + c - 4800 + e / 10;
-  return [Math.floor(day), Math.floor(month), Math.floor(year)];
+  b = Math.floor((4 * a + 3) / 146097);
+  c = a - Math.floor((146097 * b) / 4);
+  d = Math.floor((4 * c + 3) / 1461);
+  e = c - Math.floor((1461 * d) / 4);
+  m = Math.floor((5 * e + 2) / 153);
+  day = e - Math.floor((153 * m + 2) / 5) + 1;
+  month = m + 3 - 12 * Math.floor(m / 10);
+  year = 100 * b + d - 4800 + Math.floor(m / 10);
+  return [day, month, year];
 }
 
 // *** Date*** day,month,year to Numeric date
 function dateToJd(dd, mm, yy) {
-  let a, y, m, jd;
-  a = (14 - mm) / 12;
-  a = Math.floor(a);
-  y = yy + 4800 - a;
-  m = mm + 12 * a - 3;
-  jd = dd + (153 * m + 2) / 5 + 365 * y + y / 4 - y / 100 + y / 400 - 32045;
-  return Math.floor(jd);
+  let a = Math.floor((14 - mm) / 12);
+  let y = yy + 4800 - a;
+  let m = mm + 12 * a - 3;
+  return dd + Math.floor((153 * m + 2) / 5) + 365 * y + Math.floor(y / 4) - Math.floor(y / 100) + Math.floor(y / 400) - 32045;
 }
 
 // *** SUN*** LONGITUDE
@@ -192,3 +189,12 @@ function lunarToSolar(dateObj) {
 
 export default { solarToLunar, lunarToSolar };
 export { solarToLunar, lunarToSolar };
+
+// Simple debug helper (not exported by default runtime) for manual verification
+if (process.env.DEBUG_LUNAR === '1') {
+  const sample = { day: 19, month: 2, year: 2024 };
+  const l = solarToLunar(sample);
+  const s = lunarToSolar(l);
+  // eslint-disable-next-line no-console
+  console.log('[DEBUG_LUNAR] roundtrip', { sample, lunar: l, back: s });
+}
