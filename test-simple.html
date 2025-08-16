@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Interface - Phong Thủy App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .panel {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .test-btn {
+            padding: 15px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            text-align: center;
+        }
+        .test-btn:hover {
+            background: #0056b3;
+        }
+        iframe {
+            width: 100%;
+            height: 700px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+        }
+        .results {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .success { color: green; font-weight: bold; }
+        .error { color: red; font-weight: bold; }
+        .info { color: blue; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test Interface - Ứng Dụng Phong Thủy</h1>
+    
+    <div class="panel">
+        <h2>🎛️ Test Controls</h2>
+        <div class="test-grid">
+            <button class="test-btn" onclick="testAnalysis()">🔮 Test Phân Tích Chính</button>
+            <button class="test-btn" onclick="testWards()">🏠 Test Danh Sách Phường</button>
+            <button class="test-btn" onclick="testIssues()">⚠️ Test Lỗi Phong Thủy</button>
+            <button class="test-btn" onclick="testCompass()">🧭 Test La Bàn</button>
+            <button class="test-btn" onclick="testAuspicious()">🌟 Test Ngày Tốt</button>
+            <button class="test-btn" onclick="testAll()">🤖 Test Tất Cả</button>
+        </div>
+        <div id="status" class="info">Ready to test...</div>
+    </div>
+
+    <div class="panel">
+        <h2>📱 Application</h2>
+        <iframe id="app" src="http://localhost:8001"></iframe>
+    </div>
+
+    <div class="panel">
+        <h2>📊 Test Results</h2>
+        <div id="results" class="results">Click a test button to see results...</div>
+    </div>
+
+    <script>
+        const app = document.getElementById('app');
+        const status = document.getElementById('status');
+        const results = document.getElementById('results');
+        let testLog = [];
+
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            testLog.push('[' + timestamp + '] ' + message);
+            status.className = type;
+            status.textContent = message;
+            updateResults();
+        }
+
+        function updateResults() {
+            results.innerHTML = testLog.map(line => '<div>' + line + '</div>').join('');
+            results.scrollTop = results.scrollHeight;
+        }
+
+        function execInApp(code) {
+            try {
+                const appWindow = app.contentWindow;
+                return appWindow.eval(code);
+            } catch (e) {
+                log('Error: ' + e.message, 'error');
+                return null;
+            }
+        }
+
+        function testAnalysis() {
+            log('Testing main analysis button...', 'info');
+            execInApp(`
+                const date = document.querySelector('#date');
+                const btn = document.querySelector('#btn-analyze');
+                if (date) date.value = '2025-01-15';
+                if (btn) {
+                    btn.click();
+                    console.log('Analysis button clicked');
+                } else {
+                    console.log('Analysis button not found');
+                }
+            `);
+            setTimeout(() => log('Analysis test completed', 'success'), 2000);
+        }
+
+        function testWards() {
+            log('Testing ward selection...', 'info');
+            execInApp(`
+                const province = document.querySelector('#province');
+                if (province && province.options.length > 1) {
+                    province.value = province.options[1].value;
+                    province.dispatchEvent(new Event('change'));
+                    console.log('Province selected');
+                } else {
+                    console.log('Province select not found or empty');
+                }
+            `);
+            setTimeout(() => {
+                const wardCount = execInApp(`
+                    const ward = document.querySelector('#ward');
+                    ward ? ward.options.length : 0;
+                `);
+                if (wardCount > 1) {
+                    log('Ward test passed - ' + wardCount + ' wards loaded', 'success');
+                } else {
+                    log('Ward test failed - no wards loaded', 'error');
+                }
+            }, 1000);
+        }
+
+        function testIssues() {
+            log('Testing feng shui issues...', 'info');
+            execInApp(`
+                const btn = document.querySelector('#btn-analyze-issues');
+                if (btn) {
+                    btn.click();
+                    console.log('Issues button clicked');
+                } else {
+                    console.log('Issues button not found');
+                }
+            `);
+            setTimeout(() => log('Issues test completed', 'success'), 2000);
+        }
+
+        function testCompass() {
+            log('Testing compass...', 'info');
+            execInApp(`
+                const btn = document.querySelector('#btn-compass');
+                if (btn) {
+                    btn.click();
+                    console.log('Compass button clicked');
+                } else {
+                    console.log('Compass button not found');
+                }
+            `);
+            setTimeout(() => log('Compass test completed', 'success'), 1000);
+        }
+
+        function testAuspicious() {
+            log('Testing auspicious days...', 'info');
+            execInApp(`
+                const btn = document.querySelector('#btn-auspicious');
+                if (btn) {
+                    btn.click();
+                    console.log('Auspicious button clicked');
+                } else {
+                    console.log('Auspicious button not found');
+                }
+            `);
+            setTimeout(() => log('Auspicious test completed', 'success'), 1000);
+        }
+
+        async function testAll() {
+            log('Starting comprehensive test...', 'info');
+            
+            testAnalysis();
+            await new Promise(resolve => setTimeout(resolve, 3000));
+            
+            testWards();
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            testIssues();
+            await new Promise(resolve => setTimeout(resolve, 3000));
+            
+            testCompass();
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            testAuspicious();
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            log('All tests completed!', 'success');
+        }
+
+        app.onload = function() {
+            log('Application loaded successfully!', 'success');
+        };
+    </script>
+</body>
+</html>

@@ -4,7 +4,7 @@ import { ISSUES, detectIssues } from './siteIssues.mjs';
 import { computeCanChiAndStars } from './advancedHoroscope.mjs';
 import WARDS, { getWardsForProvince } from './wards.mjs';
 import getAuspiciousDays from './getAuspiciousDays.mjs';
-import lunar from './lunar.js';
+import lunar from './lunar.mjs';
 import {
   getEffectiveBirthYear,
   tuoiMu,
@@ -275,43 +275,24 @@ async function renderResult(R,i){
   html+=`<p><strong>Tờ/Thửa:</strong> ${i.bds.to||'—'} / ${i.bds.thua||'—'}</p>`;
   html+=`<p><strong>Giá:</strong> ${i.bds.price?new Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND'}).format(i.bds.price):'—'}</p>`;
   html+=`<p><strong>Ghi chú:</strong> ${i.bds.note||'—'}</p>`;
-  html+=`<hr/><h3 class="block-title">Phân tích AI</h3><div id="ai-analysis"><em>Đang phân tích…</em></div>`;
+  // AI section removed; previously displayed disabled notice
   if(resEl) resEl.innerHTML=html;
-  try {
-    const ai = await getAiAnalysis({ input: i, result: R });
-    document.getElementById('ai-analysis').textContent = ai.text || 'Không có phản hồi';
-  } catch (err) {
-    let msg;
-    if (err.message === 'Missing AI_API_KEY') {
-      msg = 'Thiếu AI_API_KEY. Hãy thiết lập biến AI_API_KEY và khởi động lại server.';
-    } else if (err.message === 'Network error') {
-      msg = 'Không thể kết nối máy chủ. Hãy đảm bảo server đang chạy.';
-    } else {
-      msg = 'Lỗi AI: ' + (err.message || err);
-    }
-    document.getElementById('ai-analysis').textContent = msg;
-  }
+  // AI analysis temporarily disabled to prevent server crashes
+  // try {
+  //   const ai = await getAiAnalysis({ input: i, result: R });
+  //   document.getElementById('ai-analysis').textContent = ai.text || 'Không có phản hồi';
+  // } catch (err) {
+  //   let msg;
+  //   if (err.message === 'Network error') {
+  //     msg = 'Không thể kết nối máy chủ. Hãy đảm bảo server đang chạy.';
+  //   } else {
+  //     msg = 'Lỗi AI: ' + (err.message || err);
+  //   }
+  //   document.getElementById('ai-analysis').textContent = msg;
+  // }
 }
 
-async function getAiAnalysis(payload) {
-  try {
-    const res = await fetch('./api/ai-analyze', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text: JSON.stringify(payload) }),
-    });
-    const data = await res.json().catch(() => ({}));
-    if (!res.ok) {
-      throw new Error(data.error || 'Network error');
-    }
-    return data;
-  } catch (err) {
-    if (err.name === 'TypeError') {
-      throw new Error('Network error');
-    }
-    throw err;
-  }
-}
+// getAiAnalysis removed (AI disabled)
 
 /* ====== Vẽ đa giác nền nhà ====== */
 const polygonPoints=[];
@@ -594,14 +575,11 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   }
 
   // Analyze
-const btnAnalyze = document.getElementById('btn-analyze');
-if (!btnAnalyze) {
-console.error('Không tìm thấy nút phân tích phong thủy với ID btn-analyze');
-} else {
-  btnAnalyze.addEventListener('click', async () => {
-    await analyzeFengShui();
-  });
-}
+  const btnAnalyze = document.getElementById('btn-analyze');
+  if (!btnAnalyze) {
+    console.error('Không tìm thấy nút phân tích phong thủy với ID btn-analyze');
+  } else {
+    btnAnalyze.addEventListener('click', async () => {
       const i=gatherInputs();
       const err=validateInputs(i);
       const resultEl=document.getElementById('result-content');
@@ -618,6 +596,7 @@ console.error('Không tìm thấy nút phân tích phong thủy với ID btn-ana
       }catch(err){ alert('Lỗi: '+(err.message||err)); }
     });
   }
+  
   const btnGood=document.getElementById('btn-auspicious');
   if(btnGood){
     btnGood.addEventListener('click',()=>{
@@ -628,9 +607,23 @@ console.error('Không tìm thấy nút phân tích phong thủy với ID btn-ana
         if(!ym) return alert('Vui lòng chọn tháng.');
         let [y,m]=ym.split('-').map(Number);
         ({year:y,month:m}=ensureSolarMonth(y,m));
-        const days = getAuspiciousDays(birth, y, m);
-        const el=document.getElementById('auspicious-days');
-        if(el) el.innerHTML = days.length?`<strong>Ngày đẹp:</strong> ${days.join(', ')}`:'Không có ngày phù hợp.';
+        fetch(`./api/auspicious-days?birth=${encodeURIComponent(birth)}&year=${y}&month=${m}`)
+          .then(r=>r.json().then(j=>({ok:r.ok,body:j})))
+          .then(({ok,body})=>{
+            const el=document.getElementById('auspicious-days');
+            if(!el) return;
+            if(!ok){
+              if(body.error==='Invalid birth') el.innerHTML='<span class="bad">Ngày sinh không hợp lệ.</span>';
+              else el.innerHTML='<span class="bad">Lỗi: '+(body.error||'Không lấy được ngày')+'</span>';
+              return;
+            }
+            const days=body.days||[];
+            el.innerHTML = days.length?`<strong>Ngày đẹp:</strong> ${days.join(', ')}`:'Không có ngày phù hợp.';
+          })
+          .catch(e=>{
+            const el=document.getElementById('auspicious-days');
+            if(el) el.innerHTML='<span class="bad">Lỗi mạng</span>';
+          });
       }catch(err){ alert('Lỗi: '+(err.message||err)); }
     });
   }

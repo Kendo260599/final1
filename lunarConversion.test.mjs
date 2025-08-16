@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert';
-import lunar from './lunar.js';
+import lunar from './lunar.mjs';
 const { solarToLunar, lunarToSolar } = lunar;
 
 test('solar to lunar back to solar', () => {

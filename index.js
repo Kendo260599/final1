@@ -2,26 +2,19 @@ const express = require("express");
 require("dotenv").config();
 const { spawn } = require("child_process");
 const path = require("path");
-const fetch =
-  global.fetch ||
-  ((...args) => import("node-fetch").then(({ default: f }) => f(...args)));
+// Keep fetch polyfill for any internal future use (AI removed)
+const fetch = global.fetch || ((...args) => import("node-fetch").then(({ default: f }) => f(...args)));
 
-// helper fetchWithTimeout using AbortController
-async function fetchWithTimeout(url, options = {}, ms) {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), ms);
-  try {
-    const response = await fetch(url, { ...options, signal: controller.signal });
-    return response;
-  } finally {
-    clearTimeout(timeout);
-  }
-}
+// AI features fully removed: no AI endpoints
 
 const app = express();
 app.use(express.json());
 
+// Serve static files from public directory
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Serve static files from root directory (for JS modules, data files, etc.)
+app.use(express.static(__dirname));
 
 app.get("/api/chart", (req, res) => {
   const { name } = req.query;
@@ -51,116 +44,15 @@ app.get("/api/chart", (req, res) => {
   });
 });
 
-app.post("/api/ai-analyze", async (req, res) => {
-  try {
-    const apiKey = process.env.AI_API_KEY;
-    if (!apiKey) {
-      return res.status(503).json({
-        error: "Missing AI_API_KEY",
-        message: "Set AI_API_KEY in the server environment or .env file",
-      });
-    }
+// NOTE: Former AI endpoints (/api/ai-analyze, /api/horoscope) removed entirely
 
-    if (
-      !req.body ||
-      typeof req.body !== "object" ||
-      Array.isArray(req.body) ||
-      typeof req.body.text !== "string"
-    ) {
-      return res.status(400).json({ error: "Invalid body" });
-    }
-
-    const prompt = JSON.stringify(req.body);
-    const timeout = parseInt(process.env.AI_TIMEOUT_MS, 10) || 10000;
-    const response = await fetchWithTimeout(
-      "https://api.openai.com/v1/chat/completions",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${apiKey}`,
-        },
-        body: JSON.stringify({
-          model: "gpt-3.5-turbo",
-          messages: [
-            { role: "system", content: "Bạn là chuyên gia phong thủy." },
-            {
-              role: "user",
-              content: `Hãy phân tích phong thủy dựa trên dữ liệu: ${prompt}`,
-            },
-          ],
-          temperature: 0.7,
-        }),
-      },
-      timeout
-    );
-
-    if (!response.ok) {
-      const errText = await response.text();
-      return res.status(500).json({ error: errText });
-    }
-
-    const data = await response.json();
-    const text = data.choices && data.choices[0]?.message?.content?.trim();
-    res.json({ text });
-  } catch (err) {
-    if (err.name === "AbortError") {
-      return res.status(504).json({ error: "AI request timed out" });
-    }
-    console.error(err);
-    res.status(500).json({ error: "AI request failed" });
-  }
-});
-
-app.get("/api/horoscope", async (req, res) => {
-  try {
-    const apiKey = process.env.AI_API_KEY;
-    if (!apiKey) {
-      return res.status(500).json({ error: "Missing AI_API_KEY" });
-    }
-    const { birth, gender } = req.query;
-    const birthRegex = /^\d{4}-\d{2}-\d{2}$/;
-    const allowedGenders = new Set(["nam", "nu", "khac"]);
-    if (!birthRegex.test(birth) || !allowedGenders.has(gender)) {
-      return res.status(400).json({ error: "Invalid parameters" });
-    }
-    const prompt = `Sinh ngày ${birth}, giới tính ${gender}. Hãy phân tích tử vi gồm năm can chi, ngũ hành, cục, sao.`;
-    const timeout = parseInt(process.env.AI_TIMEOUT_MS, 10) || 10000;
-    const response = await fetchWithTimeout(
-      "https://api.openai.com/v1/chat/completions",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${apiKey}`,
-        },
-        body: JSON.stringify({
-          model: "gpt-3.5-turbo",
-          messages: [
-            { role: "system", content: "Bạn là chuyên gia tử vi." },
-            { role: "user", content: prompt },
-          ],
-          temperature: 0.7,
-        }),
-      },
-      timeout
-    );
-    if (!response.ok) {
-      const errText = await response.text();
-      return res.status(500).json({ error: errText });
-    }
-    const data = await response.json();
-    const text = data.choices && data.choices[0]?.message?.content?.trim();
-    res.json({ text });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Horoscope request failed" });
-  }
-});
+// Health check
+app.get('/health', (req, res) => res.json({ status: 'ok' }));
 
 app.get("/api/auspicious-days", async (req, res) => {
   try {
     const { default: getAuspiciousDays } = await import("./getAuspiciousDays.mjs");
+    const { default: parseDateParts } = await import("./parseDateParts.mjs");
     const { birth, year, month } = req.query;
     const y = parseInt(year, 10),
       m = parseInt(month, 10);
@@ -169,6 +61,19 @@ app.get("/api/auspicious-days", async (req, res) => {
     }
     if (y <= 0 || m < 1 || m > 12) {
       return res.status(400).json({ error: "Invalid params" });
+    }
+    // Validate birth format and logical ranges
+    try {
+      const { year: by, month: bm, day: bd } = parseDateParts(String(birth));
+      if (bm < 1 || bm > 12 || bd < 1 || bd > 31) {
+        return res.status(400).json({ error: "Invalid birth" });
+      }
+      // Basic future check (optional): birth year should not exceed target year + 1
+      if (by > y + 1) {
+        return res.status(400).json({ error: "Invalid birth" });
+      }
+    } catch (e) {
+      return res.status(400).json({ error: "Invalid birth" });
     }
     const days = getAuspiciousDays(birth, y, m);
     res.json({ days });

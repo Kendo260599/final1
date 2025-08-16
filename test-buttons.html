@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Buttons - Phong Thủy Lê Gia</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; }
+        .success { color: green; }
+        .error { color: red; }
+        .warning { color: orange; }
+        .log { margin: 5px 0; padding: 5px; background: #f5f5f5; }
+        button { margin: 5px; padding: 10px; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test Tự Động - Tất Cả Nút Bấm</h1>
+    
+    <div class="test-section">
+        <h2>🎛️ Điều Khiển Test</h2>
+        <button onclick="startAutoTest()">🚀 Bắt Đầu Test Tự Động</button>
+        <button onclick="clearLogs()">🗑️ Xóa Log</button>
+        <button onclick="window.open('http://localhost:3000', '_blank')">🌐 Mở Ứng Dụng Chính</button>
+    </div>
+
+    <div class="test-section">
+        <h2>📊 Kết Quả Test</h2>
+        <div id="test-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>📝 Chi Tiết Log</h2>
+        <div id="test-logs"></div>
+    </div>
+
+    <script>
+        const results = document.getElementById('test-results');
+        const logs = document.getElementById('test-logs');
+        
+        function log(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `log ${type}`;
+            div.innerHTML = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logs.appendChild(div);
+            logs.scrollTop = logs.scrollHeight;
+        }
+
+        function clearLogs() {
+            logs.innerHTML = '';
+            results.innerHTML = '';
+        }
+
+        async function testButton(selector, name, action = 'click') {
+            try {
+                log(`🔍 Testing button: ${name} (${selector})`);
+                
+                // Mở ứng dụng trong iframe ẩn để test
+                const iframe = document.createElement('iframe');
+                iframe.src = 'http://localhost:3000';
+                iframe.style.display = 'none';
+                document.body.appendChild(iframe);
+                
+                return new Promise((resolve) => {
+                    iframe.onload = () => {
+                        try {
+                            const doc = iframe.contentDocument;
+                            const button = doc.querySelector(selector);
+                            
+                            if (!button) {
+                                log(`❌ Button not found: ${name}`, 'error');
+                                resolve(false);
+                                return;
+                            }
+                            
+                            if (button.disabled) {
+                                log(`⚠️ Button disabled: ${name}`, 'warning');
+                                resolve(false);
+                                return;
+                            }
+                            
+                            // Test click event
+                            button.click();
+                            
+                            // Đợi 1 giây để xem phản ứng
+                            setTimeout(() => {
+                                log(`✅ Button clicked successfully: ${name}`, 'success');
+                                document.body.removeChild(iframe);
+                                resolve(true);
+                            }, 1000);
+                            
+                        } catch (error) {
+                            log(`❌ Error testing ${name}: ${error.message}`, 'error');
+                            document.body.removeChild(iframe);
+                            resolve(false);
+                        }
+                    };
+                });
+                
+            } catch (error) {
+                log(`❌ Error setting up test for ${name}: ${error.message}`, 'error');
+                return false;
+            }
+        }
+
+    async function testAPIEndpoint(endpoint, name, method = 'GET', body = null, expectedStatus = 200) {
+            try {
+                log(`🌐 Testing API: ${name} (${method} ${endpoint})`);
+                
+                const options = {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                };
+                
+                if (body) {
+                    options.body = JSON.stringify(body);
+                }
+                
+                const response = await fetch(`http://localhost:3000${endpoint}`, options);
+                
+                if (response.status === expectedStatus) {
+                    log(`✅ API ${name} trả về đúng trạng thái mong đợi ${expectedStatus}`, 'success');
+                    return true;
+                } else if (expectedStatus === 410 && response.status === 410) {
+                    log(`✅ ${name}: 410 (disabled)`, 'success');
+                    return true;
+                } else {
+                    log(`❌ API ${name}: Expected ${expectedStatus} nhận ${response.status}`, 'error');
+                    return false;
+                }
+                
+            } catch (error) {
+                log(`❌ API error: ${name} - ${error.message}`, 'error');
+                return false;
+            }
+        }
+
+        async function testFileExists(filePath, name) {
+            try {
+                log(`📁 Testing file: ${name} (${filePath})`);
+                
+                const response = await fetch(`http://localhost:3000${filePath}`);
+                
+                if (response.ok) {
+                    log(`✅ File exists: ${name}`, 'success');
+                    return true;
+                } else {
+                    log(`❌ File missing: ${name} - Status: ${response.status}`, 'error');
+                    return false;
+                }
+                
+            } catch (error) {
+                log(`❌ File test error: ${name} - ${error.message}`, 'error');
+                return false;
+            }
+        }
+
+        async function startAutoTest() {
+            clearLogs();
+            log('🚀 Bắt đầu test tự động...', 'info');
+            
+            const tests = [];
+            let passed = 0;
+            let failed = 0;
+
+            // Test các file tĩnh quan trọng
+            log('📁 Testing static files...', 'info');
+            tests.push(['style.css', 'CSS File']);
+            tests.push(['script.js', 'Main Script']);
+            tests.push(['data/wards.json', 'Wards Data']);
+            
+            for (const [file, name] of tests) {
+                const result = await testFileExists(`/${file}`, name);
+                if (result) passed++; else failed++;
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+
+            // Test API endpoints
+            log('🌐 Testing API endpoints...', 'info');
+            const apiTests = [
+                ['/api/auspicious-days?birth=1990-01-01&year=2025&month=8', 'Auspicious Days API', 'GET', null, 200],
+                ['/api/chart?name=Test', 'Chart API', 'GET', null, 200],
+                ['/health', 'Health Endpoint', 'GET', null, 200]
+            ];
+            
+            for (const def of apiTests) {
+                const [endpoint,name,method='GET',body=null,expected=200] = def;
+                const result = await testAPIEndpoint(endpoint, name, method, body, expected);
+                if (result) passed++; else failed++;
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+
+            // (Former AI endpoints removed)
+
+            // Test modules import (kiểm tra console errors)
+            log('📦 Testing module imports...', 'info');
+            const moduleTests = [
+                'lunar.mjs',
+                'siteIssues.mjs', 
+                'wards.mjs',
+                'parseDateParts.mjs',
+                'fortune.mjs'
+            ];
+            
+            for (const module of moduleTests) {
+                try {
+                    const response = await fetch(`http://localhost:3000/${module}`);
+                    if (response.ok) {
+                        log(`✅ Module accessible: ${module}`, 'success');
+                        passed++;
+                    } else {
+                        log(`❌ Module not accessible: ${module}`, 'error');
+                        failed++;
+                    }
+                } catch (error) {
+                    log(`❌ Module test error: ${module} - ${error.message}`, 'error');
+                    failed++;
+                }
+                await new Promise(resolve => setTimeout(resolve, 300));
+            }
+
+            // Kiểm tra main page load
+            log('🏠 Testing main page load...', 'info');
+            try {
+                const response = await fetch('http://localhost:3000');
+                if (response.ok) {
+                    const html = await response.text();
+                    const hasTitle = html.includes('Phong Thủy Lê Gia');
+                    const hasAnalyzeButton = html.includes('btn-analyze');
+                    const hasIssuesContainer = html.includes('issues-container');
+                    const hasWardSelect = html.includes('bd-ward');
+                    
+                    if (hasTitle && hasAnalyzeButton && hasIssuesContainer && hasWardSelect) {
+                        log(`✅ Main page loaded with all required elements`, 'success');
+                        passed++;
+                    } else {
+                        log(`⚠️ Main page missing some elements`, 'warning');
+                        log(`  - Title: ${hasTitle}`, hasTitle ? 'success' : 'error');
+                        log(`  - Analyze Button: ${hasAnalyzeButton}`, hasAnalyzeButton ? 'success' : 'error');
+                        log(`  - Issues Container: ${hasIssuesContainer}`, hasIssuesContainer ? 'success' : 'error');
+                        log(`  - Ward Select: ${hasWardSelect}`, hasWardSelect ? 'success' : 'error');
+                        failed++;
+                    }
+                } else {
+                    log(`❌ Main page failed to load - Status: ${response.status}`, 'error');
+                    failed++;
+                }
+            } catch (error) {
+                log(`❌ Main page test error: ${error.message}`, 'error');
+                failed++;
+            }
+
+            // Hiển thị kết quả tổng hợp
+            const total = passed + failed;
+            const percentage = total > 0 ? ((passed / total) * 100).toFixed(1) : 0;
+            
+            results.innerHTML = `
+                <h3>📊 Kết Quả Test Tổng Hợp</h3>
+                <div style="font-size: 18px; margin: 10px 0;">
+                    <div class="success">✅ Passed: ${passed}</div>
+                    <div class="error">❌ Failed: ${failed}</div>
+                    <div><strong>📈 Success Rate: ${percentage}%</strong></div>
+                </div>
+                
+                <h4>🔧 Khuyến nghị:</h4>
+                <ul>
+                    ${failed === 0 ? 
+                        '<li class="success">🎉 Tất cả test đều passed! Ứng dụng hoạt động tốt.</li>' :
+                        `<li class="warning">⚠️ Có ${failed} test failed. Hãy kiểm tra log chi tiết ở trên.</li>`
+                    }
+                    <li>📱 Hãy test thủ công các nút bấm trên giao diện chính.</li>
+                    <li>🔄 Reload lại trang nếu có lỗi cache.</li>
+                    <li>🗂️ Kiểm tra tất cả dữ liệu file có đầy đủ không.</li>
+                </ul>
+            `;
+
+            log(`🏁 Test hoàn thành! Passed: ${passed}/${total} (${percentage}%)`, 
+                 percentage >= 80 ? 'success' : percentage >= 60 ? 'warning' : 'error');
+        }
+    </script>
+</body>
+</html>

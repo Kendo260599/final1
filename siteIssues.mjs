@@ -123,19 +123,12 @@ ISSUES.forEach(issue => {
 
 export function detectIssues(inputs = {}) {
   if (!inputs || Object.keys(inputs).length === 0) {
-    console.warn('Thiếu dữ liệu đầu vào để phân tích phong thủy');
-    return [];
+    return { ids: [], problems: [], solutions: [] };
   }
+  const ids = [];
   ISSUES.forEach(issue => {
     const fn = ISSUE_DETECTORS[issue.id];
-    if (fn && fn(inputs)) ids.push(issue.id);
-  });
-    const fn = ISSUE_DETECTORS[issue.id];
-    try {
-      if (fn && fn(inputs)) ids.push(issue.id);
-    } catch {
-      /* ignore detector errors */
-    }
+    try { if (fn && fn(inputs)) ids.push(issue.id); } catch { /* ignore */ }
   });
   const problems = [];
   const solutions = [];

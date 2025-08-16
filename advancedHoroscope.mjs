@@ -1,4 +1,4 @@
-import lunar from './lunar.js';
+import lunar from './lunar.mjs';
 import zodiac from './zodiac.js';
 const { solarToLunar } = lunar;
 

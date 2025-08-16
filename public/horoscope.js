@@ -13,17 +13,10 @@ export async function calculateHoroscope(birth, gender){
     nguHanh:element,
     cuc:`${element} cục`
   };
-  try{
-    const res=await fetch(`./api/horoscope?birth=${encodeURIComponent(birth)}&gender=${encodeURIComponent(gender)}`);
-    if(res.ok){
-      const data=await res.json();
-      Object.assign(result,data);
-    }
-  }catch(err){ /* optional API */ }
+  // Remote AI call removed
   return result;
 }
 
 export async function fetchChart(name){
-  const res=await fetch(`./api/chart?name=${encodeURIComponent(name)}`);
-  return await res.json();
+  return { message: 'Chart API disabled' };
 }

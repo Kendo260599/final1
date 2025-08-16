@@ -41,19 +41,7 @@ will apply the migration automatically.
 Ứng dụng dùng polyfill `node-fetch` để cung cấp hàm `fetch` trên Node.js < 18.
 Nếu không dùng polyfill này, hãy đảm bảo môi trường Node.js >= 18.
 
-1. Sao chép file cấu hình mẫu và điền khóa API:
-
-   ```bash
-   cp .env.example .env
-   ```
-
-   Sau đó chỉnh sửa file `.env` và bổ sung dòng:
-
-   ```bash
-   AI_API_KEY="<khóa_AI_của_bạn>"
-   ```
-
-   Biến `AI_API_KEY` dùng để xác thực với dịch vụ AI cho các tính năng liên quan. Nếu không thiết lập biến này, các API liên quan sẽ trả về mã lỗi `503`.
+1. (Tuỳ chọn) Tạo file `.env` nếu cần các biến môi trường khác. (AI đã bị gỡ bỏ hoàn toàn; không còn biến AI_API_KEY.)
 
 2. (Tuỳ chọn) Chỉ định đường dẫn database bằng biến môi trường `BIRTH_DB` (mặc định `birth_info.db`):
 
@@ -68,7 +56,7 @@ Nếu không dùng polyfill này, hãy đảm bảo môi trường Node.js >= 18
    export PYTHON="/path/to/python"
    ```
 
-4. Cài đặt phụ thuộc và chạy server:
+4. Cài đặt phụ thuộc và chạy server (Node >=18 khuyến nghị):
 
    ```bash
    npm install
@@ -80,6 +68,10 @@ Nếu không dùng polyfill này, hãy đảm bảo môi trường Node.js >= 18
    ```bash
    npm test
    ```
+
+## Trạng thái AI
+
+Các tính năng AI (phân tích nâng cao, horoscope dựa trên AI) đã bị loại bỏ hoàn toàn; không còn endpoint hoặc biến môi trường liên quan.
 
 ## Lưu ý phát triển giao diện
 

@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <ti            resultsDiv.innerHTML = testResults.map(result => 
+                '<div class="status ' + result.type + '">' +
+                    '<strong>' + new Date(result.timestamp).toLocaleTimeString() + '</strong>: ' + result.message +
+                '</div>'
+            ).join('');est All Buttons - Phong Thủy App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-panel {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .test-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .test-btn {
+            padding: 10px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .test-btn:hover {
+            background: #0056b3;
+        }
+        .app-frame {
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        iframe {
+            width: 100%;
+            height: 800px;
+            border: none;
+        }
+        .console-output {
+            background: #000;
+            color: #0f0;
+            padding: 15px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .status.success { background: #d4edda; color: #155724; }
+        .status.error { background: #f8d7da; color: #721c24; }
+        .status.info { background: #d1ecf1; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test All Buttons - Ứng Dụng Phong Thủy</h1>
+    
+    <div class="test-panel">
+        <h2>🎛️ Control Panel</h2>
+        <div class="test-buttons">
+            <button class="test-btn" onclick="runAutoTest()">🤖 Auto Test All</button>
+            <button class="test-btn" onclick="testMainAnalysis()">🔮 Test Phân Tích Chính</button>
+            <button class="test-btn" onclick="testWards()">🏠 Test Danh Sách Phường</button>
+            <button class="test-btn" onclick="testIssues()">⚠️ Test 50+ Lỗi Phong Thủy</button>
+            <button class="test-btn" onclick="testCompass()">🧭 Test La Bàn</button>
+            <button class="test-btn" onclick="testAuspicious()">🌟 Test Ngày Tốt</button>
+            <button class="test-btn" onclick="testAdvanced()">🔮 Test Horoscope Nâng Cao</button>
+            <button class="test-btn" onclick="testFortune()">🎰 Test Vận May</button>
+            <button class="test-btn" onclick="clearResults()">🧹 Clear Results</button>
+        </div>
+        
+        <div id="test-status" class="status info">
+            ✅ Server running on http://localhost:8001 - Ready to test!
+        </div>
+    </div>
+
+    <div class="test-panel">
+        <h2>📱 Application Under Test</h2>
+        <div class="app-frame">
+            <iframe id="app-frame" src="http://localhost:8001"></iframe>
+        </div>
+    </div>
+
+    <div class="test-panel">
+        <h2>📊 Test Results</h2>
+        <div id="test-results">
+            <p>Click a test button to see results...</p>
+        </div>
+        <div id="console-output" class="console-output" style="display: none;"></div>
+    </div>
+
+    <script>
+        let testResults = [];
+        const iframe = document.getElementById('app-frame');
+        const statusDiv = document.getElementById('test-status');
+        const resultsDiv = document.getElementById('test-results');
+        const consoleDiv = document.getElementById('console-output');
+
+        // Helper to execute code in iframe
+        function executeInIframe(code) {
+            try {
+                const iframeWindow = iframe.contentWindow;
+                const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
+                
+                if (iframeDocument.readyState === 'complete') {
+                    return iframeWindow.eval(code);
+                } else {
+                    throw new Error('iframe not ready');
+                }
+            } catch (e) {
+                logResult('❌ Error executing in iframe: ' + e.message, 'error');
+                return null;
+            }
+        }
+
+        // Helper to log results
+        function logResult(message, type = 'info') {
+            testResults.push({ message, type, timestamp: new Date().toISOString() });
+            updateResults();
+            
+            if (type === 'error') {
+                statusDiv.className = 'status error';
+                statusDiv.textContent = '❌ ' + message;
+            } else if (type === 'success') {
+                statusDiv.className = 'status success';
+                statusDiv.textContent = '✅ ' + message;
+            } else {
+                statusDiv.className = 'status info';
+                statusDiv.textContent = '📝 ' + message;
+            }
+        }
+
+        function updateResults() {
+            resultsDiv.innerHTML = testResults.map(result => 
+                \`<div class="status \${result.type}">
+                    <strong>\${new Date(result.timestamp).toLocaleTimeString()}</strong>: \${result.message}
+                </div>\`
+            ).join('');
+        }
+
+        function runAutoTest() {
+            logResult('Starting automatic test of all buttons...', 'info');
+            
+            executeInIframe(\`
+                console.log('🧪 Starting auto test from external frame...');
+                
+                async function autoTestFromExternal() {
+                    let results = { passed: 0, failed: 0, details: [] };
+                    
+                    // Test 1: Date input
+                    const dateInput = document.querySelector('#date');
+                    if (dateInput) {
+                        dateInput.value = '2025-01-15';
+                        dateInput.dispatchEvent(new Event('change'));
+                        results.passed++;
+                        results.details.push('✅ Date input set');
+                    } else {
+                        results.failed++;
+                        results.details.push('❌ Date input not found');
+                    }
+                    
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    
+                    // Test 2: Main analysis
+                    const btnAnalyze = document.querySelector('#btn-analyze');
+                    if (btnAnalyze) {
+                        btnAnalyze.click();
+                        results.details.push('✅ Clicked main analysis button');
+                        await new Promise(resolve => setTimeout(resolve, 2000));
+                        
+                        const lunarResult = document.querySelector('#lunarResult');
+                        const horoscopeResult = document.querySelector('#horoscopeResult');
+                        
+                        if (lunarResult && lunarResult.textContent.trim()) {
+                            results.passed++;
+                            results.details.push('✅ Lunar result displayed');
+                        } else {
+                            results.failed++;
+                            results.details.push('❌ Lunar result missing');
+                        }
+                        
+                        if (horoscopeResult && horoscopeResult.textContent.trim()) {
+                            results.passed++;
+                            results.details.push('✅ Horoscope result displayed');
+                        } else {
+                            results.failed++;
+                            results.details.push('❌ Horoscope result missing');
+                        }
+                    } else {
+                        results.failed++;
+                        results.details.push('❌ Main analysis button not found');
+                    }
+                    
+                    // Test 3: Province/Ward selection
+                    const provinceSelect = document.querySelector('#province');
+                    if (provinceSelect && provinceSelect.options.length > 1) {
+                        provinceSelect.value = provinceSelect.options[1].value;
+                        provinceSelect.dispatchEvent(new Event('change'));
+                        results.details.push('✅ Province selected');
+                        
+                        await new Promise(resolve => setTimeout(resolve, 500));
+                        
+                        const wardSelect = document.querySelector('#ward');
+                        if (wardSelect && wardSelect.options.length > 1) {
+                            results.passed++;
+                            results.details.push('✅ Wards populated');
+                        } else {
+                            results.failed++;
+                            results.details.push('❌ Wards not populated');
+                        }
+                    } else {
+                        results.failed++;
+                        results.details.push('❌ Province select not working');
+                    }
+                    
+                    // Test remaining buttons
+                    const buttonTests = [
+                        { id: '#btn-analyze-issues', name: 'Issues Analysis' },
+                        { id: '#btn-compass', name: 'Compass' },
+                        { id: '#btn-auspicious', name: 'Auspicious Days' },
+                        { id: '#btn-advanced-horoscope', name: 'Advanced Horoscope' },
+                        { id: '#btn-fortune', name: 'Fortune' }
+                    ];
+                    
+                    for (const test of buttonTests) {
+                        const btn = document.querySelector(test.id);
+                        if (btn) {
+                            btn.click();
+                            results.details.push(\`✅ Clicked \${test.name} button\`);
+                            await new Promise(resolve => setTimeout(resolve, 1000));
+                            results.passed++;
+                        } else {
+                            results.failed++;
+                            results.details.push(\`❌ \${test.name} button not found\`);
+                        }
+                    }
+                    
+                    return results;
+                }
+                
+                autoTestFromExternal().then(results => {
+                    console.log('Test completed:', results);
+                    window.parent.postMessage({
+                        type: 'testComplete',
+                        results: results
+                    }, '*');
+                });
+            \`);
+        }
+
+        function testMainAnalysis() {
+            logResult('Testing main feng shui analysis...', 'info');
+            executeInIframe(\`
+                const btn = document.querySelector('#btn-analyze');
+                if (btn) {
+                    const date = document.querySelector('#date');
+                    if (date) date.value = '2025-01-15';
+                    btn.click();
+                    window.parent.postMessage({type: 'buttonTest', button: 'analyze', success: true}, '*');
+                } else {
+                    window.parent.postMessage({type: 'buttonTest', button: 'analyze', success: false}, '*');
+                }
+            \`);
+        }
+
+        function testWards() {
+            logResult('Testing ward list functionality...', 'info');
+            executeInIframe(\`
+                const province = document.querySelector('#province');
+                if (province && province.options.length > 1) {
+                    province.value = province.options[1].value;
+                    province.dispatchEvent(new Event('change'));
+                    setTimeout(() => {
+                        const ward = document.querySelector('#ward');
+                        const success = ward && ward.options.length > 1;
+                        window.parent.postMessage({type: 'buttonTest', button: 'wards', success: success}, '*');
+                    }, 500);
+                } else {
+                    window.parent.postMessage({type: 'buttonTest', button: 'wards', success: false}, '*');
+                }
+            \`);
+        }
+
+        function testIssues() {
+            logResult('Testing feng shui issues analysis...', 'info');
+            executeInIframe(\`
+                const btn = document.querySelector('#btn-analyze-issues');
+                if (btn) {
+                    btn.click();
+                    window.parent.postMessage({type: 'buttonTest', button: 'issues', success: true}, '*');
+                } else {
+                    window.parent.postMessage({type: 'buttonTest', button: 'issues', success: false}, '*');
+                }
+            \`);
+        }
+
+        function testCompass() {
+            logResult('Testing compass functionality...', 'info');
+            executeInIframe(\`
+                const btn = document.querySelector('#btn-compass');
+                if (btn) {
+                    btn.click();
+                    window.parent.postMessage({type: 'buttonTest', button: 'compass', success: true}, '*');
+                } else {
+                    window.parent.postMessage({type: 'buttonTest', button: 'compass', success: false}, '*');
+                }
+            \`);
+        }
+
+        function testAuspicious() {
+            logResult('Testing auspicious days...', 'info');
+            executeInIframe(\`
+                const btn = document.querySelector('#btn-auspicious');
+                if (btn) {
+                    btn.click();
+                    window.parent.postMessage({type: 'buttonTest', button: 'auspicious', success: true}, '*');
+                } else {
+                    window.parent.postMessage({type: 'buttonTest', button: 'auspicious', success: false}, '*');
+                }
+            \`);
+        }
+
+        function testAdvanced() {
+            logResult('Testing advanced horoscope...', 'info');
+            executeInIframe(\`
+                const btn = document.querySelector('#btn-advanced-horoscope');
+                if (btn) {
+                    btn.click();
+                    window.parent.postMessage({type: 'buttonTest', button: 'advanced', success: true}, '*');
+                } else {
+                    window.parent.postMessage({type: 'buttonTest', button: 'advanced', success: false}, '*');
+                }
+            \`);
+        }
+
+        function testFortune() {
+            logResult('Testing fortune functionality...', 'info');
+            executeInIframe(\`
+                const btn = document.querySelector('#btn-fortune');
+                if (btn) {
+                    btn.click();
+                    window.parent.postMessage({type: 'buttonTest', button: 'fortune', success: true}, '*');
+                } else {
+                    window.parent.postMessage({type: 'buttonTest', button: 'fortune', success: false}, '*');
+                }
+            \`);
+        }
+
+        function clearResults() {
+            testResults = [];
+            updateResults();
+            resultsDiv.innerHTML = '<p>Results cleared. Click a test button to see results...</p>';
+            statusDiv.className = 'status info';
+            statusDiv.textContent = '🧹 Results cleared';
+        }
+
+        // Listen for messages from iframe
+        window.addEventListener('message', function(event) {
+            if (event.data.type === 'buttonTest') {
+                const { button, success } = event.data;
+                if (success) {
+                    logResult(\`Button test "\${button}" passed!\`, 'success');
+                } else {
+                    logResult(\`Button test "\${button}" failed!\`, 'error');
+                }
+            } else if (event.data.type === 'testComplete') {
+                const { results } = event.data;
+                logResult(\`Auto test completed: \${results.passed} passed, \${results.failed} failed\`, 
+                    results.failed === 0 ? 'success' : 'error');
+                
+                consoleDiv.style.display = 'block';
+                consoleDiv.innerHTML = results.details.map(detail => \`<div>\${detail}</div>\`).join('');
+            }
+        });
+
+        // Initialize
+        iframe.onload = function() {
+            logResult('Application loaded successfully', 'success');
+        };
+
+        iframe.onerror = function() {
+            logResult('Failed to load application', 'error');
+        };
+    </script>
+</body>
+</html>
